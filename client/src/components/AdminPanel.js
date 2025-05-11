@@ -13,7 +13,7 @@ const AdminPanel = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:8080/news', formData)
+        axios.post('https://ssnnewsserver.onrender.com/news', formData)
             .then(response => alert('News added successfully'))
             .catch(error => console.error(error));
     };

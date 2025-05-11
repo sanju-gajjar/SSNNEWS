@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080', // Use localhost if undefined or null
+    baseURL: 'https://ssnnewsserver.onrender.com', // Ensure the correct backend URL is used
     headers: {
         'Content-Type': 'application/json',
     },

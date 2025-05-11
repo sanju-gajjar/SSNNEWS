@@ -42,7 +42,7 @@ const Login = ({ setIsLoggedIn }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/login', { email, password });
+      const response = await axios.post('https://ssnnewsserver.onrender.com/login', { email, password });
       setMessage(response.data.message);
       if (response.data.message === 'Login successful') {
         setIsLoggedIn(true);

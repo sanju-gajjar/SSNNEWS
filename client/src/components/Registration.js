@@ -43,7 +43,7 @@ const Registration = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/register', { name, email, password });
+            const response = await axios.post('https://ssnnewsserver.onrender.com/register', { name, email, password });
             setMessage(response.data.message);
             if (response.data.message === 'User registered successfully') {
                 navigate('/'); // Redirect to login page

@@ -7,7 +7,7 @@ const NewsList = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:8080/news')
+        axios.get('https://ssnnewsserver.onrender.com/news')
             .then(response => setNewsList(response.data))
             .catch(error => console.error(error));
     }, []);
