@@ -1,0 +1,10 @@
+.cardIcons{
+    padding: 0 5px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 2px;
+
+}
+
+.MuiCardHeader-title{font-size: 15px !important;}

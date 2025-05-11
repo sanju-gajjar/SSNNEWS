@@ -1,0 +1,105 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+ul,li,ol{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+a{text-decoration: none !important;}
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.news-list, .news-details, .admin-panel {
+  padding: 20px;
+}
+
+.news-item {
+  border: 1px solid #ccc;
+  margin: 10px 0;
+  padding: 10px;
+}
+
+.news-item h2 {
+  margin: 0;
+}
+
+.news-item p {
+  margin: 5px 0;
+}
+
+@media (max-width: 768px) {
+  .news-item {
+    font-size: 14px;
+  }
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.loginWrap {
+  background: url(images/bg1.jpg) center/cover no-repeat;
+  
+  height: 100vh;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.logo{
+  width:170px
+}
+
+.formLogin{
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+}
+
+form.formLogin div {
+  width: 100%;
+}
+
+
+.MuiInputLabel-shrink{font-size: 16px !important; font-weight: 400 !important;}

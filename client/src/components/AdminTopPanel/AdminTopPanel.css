@@ -1,0 +1,10 @@
+.cardHeader{
+            
+    background-color: var(--palette-secondary-light);
+    color: #fff;
+   
+}
+
+.cardHeader span{
+    line-height: 0.7 !important;
+}
