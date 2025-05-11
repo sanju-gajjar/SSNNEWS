@@ -7,12 +7,16 @@ const bcrypt = require('bcrypt'); // Add this line
 const jwt = require('jsonwebtoken'); // Add this line
 
 const corsOptions = {
-    origin: 'https://ssanews.onrender.com', // Allow this specific origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
+    origin: ['http://localhost:3000', 'https://ssanews.onrender.com'], // Allow both origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS for preflight
     allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+    credentials: true, // Allow credentials if needed
 };
 
-app.use(cors(corsOptions)); // Apply CORS middleware with options
+app.use(cors(corsOptions)); // Apply CORS middleware
+
+// Handle preflight requests globally
+app.options('*', cors(corsOptions));
 
 // Connect to MongoDB   
 require('dotenv').config();
