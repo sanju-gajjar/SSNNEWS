@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import { styled } from "@mui/material/styles";
 import ButtonBox from './UI/ButtonBox';
 import Para from './UI/Para';
+import Loader from './Loader'; // Import the Loader component
 
 const CustomTextField = styled(TextField)({
     "& div.MuiFormControl-root": {
@@ -38,10 +39,12 @@ const Registration = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false); // Add loading state
     const navigate = useNavigate(); // Initialize useNavigate
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true); // Start loading
         try {
             const response = await axios.post('https://ssnnewsserver.onrender.com/register', { name, email, password });
             setMessage(response.data.message);
@@ -50,49 +53,55 @@ const Registration = () => {
             }
         } catch (error) {
             setMessage(error.response?.data?.message || 'Registration failed');
+        } finally {
+            setLoading(false); // Stop loading
         }
     };
 
     return (
         <div className='loginWrap'>
-            <img src={logo} alt='logo' className='logo' />
-            <Para variant='h2' color='secondary' text='Register' sx={{ my: 2 }} />
-            <form onSubmit={handleSubmit} className='formLogin'>
-                <div>
-                    <CustomTextField
-                        id="standard-basic"
-                        label="Name"
-                        variant="standard"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        type='text'
-                    />
-                </div>
-                <div>
-                    <CustomTextField
-                        id="standard-basic"
-                        label="Email"
-                        variant="standard"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        type='email'
-                    />
-                </div>
-                <div>
-                    <CustomTextField
-                        id="standard-basic"
-                        label="Password"
-                        variant="standard"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        type='password'
-                    />
-                </div>
-                <ButtonBox type='submit' placeholder='Register' variant='contained' />
-            </form>
+            {loading ? <Loader /> : (
+                <>
+                    <img src={logo} alt='logo' className='logo' />
+                    <Para variant='h2' color='secondary' text='Register' sx={{ my: 2 }} />
+                    <form onSubmit={handleSubmit} className='formLogin'>
+                        <div>
+                            <CustomTextField
+                                id="standard-basic"
+                                label="Name"
+                                variant="standard"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                required
+                                type='text'
+                            />
+                        </div>
+                        <div>
+                            <CustomTextField
+                                id="standard-basic"
+                                label="Email"
+                                variant="standard"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                type='email'
+                            />
+                        </div>
+                        <div>
+                            <CustomTextField
+                                id="standard-basic"
+                                label="Password"
+                                variant="standard"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                type='password'
+                            />
+                        </div>
+                        <ButtonBox type='submit' placeholder='Register' variant='contained' />
+                    </form>
+                </>
+            )}
             {message && <p>{message}</p>}
         </div>
     );
