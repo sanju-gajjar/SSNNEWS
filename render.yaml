@@ -1,17 +1,4 @@
 services:
-  - name: ssnnews-backend
-    type: web
-    env: node
-    rootDir: server # Specify the backend directory
-    buildCommand: "npm install"
-    startCommand: "npm start"
-    envVars:
-      - key: MONGODB_URL
-        value: mongodb+srv://swadeshsandesh:2t9Z4PmygBU41RYV@clusterssn.rasxlii.mongodb.net/?retryWrites=true&w=majority&appName=ClusterSSN
-      - key: JWT_SECRET
-        value: secretkey
-    plan: free
-
   - name: ssnnews-frontend
     type: web
     env: static
