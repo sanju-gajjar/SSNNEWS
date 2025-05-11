@@ -6,7 +6,13 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt'); // Add this line
 const jwt = require('jsonwebtoken'); // Add this line
 
-app.use(cors())
+const corsOptions = {
+    origin: 'https://ssanews.onrender.com', // Allow this specific origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+};
+
+app.use(cors(corsOptions)); // Apply CORS middleware with options
 
 // Connect to MongoDB   
 require('dotenv').config();
