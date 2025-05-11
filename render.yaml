@@ -1,0 +1,22 @@
+services:
+  - name: ssnnews-backend
+    type: web
+    env: node
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    envVars:
+      - key: MONGODB_URL
+        value: <your-mongodb-url>
+      - key: JWT_SECRET
+        value: <your-jwt-secret>
+    plan: free
+
+  - name: ssnnews-frontend
+    type: web
+    env: static
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: client/build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://ssnnews-backend.onrender.com
+    plan: free

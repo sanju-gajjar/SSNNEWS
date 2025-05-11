@@ -11,6 +11,7 @@ app.use(cors())
 // Connect to MongoDB   
 require('dotenv').config();
 
+const jwtSecret = process.env.JWT_SECRET || 'defaultSecretKey';
 
 mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
@@ -61,7 +62,7 @@ app.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) return res.status(401).send({ message: 'Invalid credentials' });
 
-        const token = jwt.sign({ id: user._id }, 'secretKey', { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
         res.send({ message: 'Login successful', token });
     } catch (err) {
         res.status(400).send({ message: 'Login failed', error: err.message });
@@ -178,8 +179,10 @@ app.post('/news/comments/delete', async (req, res) => {
     }
 });
 
-app.listen(8080, () => {
-    console.log('server listening on port 8080')
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server listening on port ${PORT}`);
 });
 
 // Redirect to login if path not found
