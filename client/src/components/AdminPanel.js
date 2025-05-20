@@ -16,7 +16,7 @@ const AdminPanel = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true); // Start loading
-        axios.post('https://ssnnewsserver.onrender.com/news', formData)
+        axios.post(`${process.env.REACT_APP_API_URL}/news`, formData)
             .then(response => alert('News added successfully'))
             .catch(error => console.error(error))
             .finally(() => setLoading(false)); // Stop loading

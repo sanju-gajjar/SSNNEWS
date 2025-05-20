@@ -1,0 +1,103 @@
+
+img{width: 100%;}
+ul.news-list-crime {
+    width: 40%;
+}
+li.newsCrime-item {
+    display: flex;
+    text-align: left;
+    gap: 12px;
+}
+.news-thumbnail img{
+    max-width: 150px;
+    width: 100%;
+}
+h5.news-title{
+    margin: 0px;
+    font-size: 11px;
+    font-weight: normal;
+}
+
+p.news-summary {
+    font-size: 11px;
+    margin: 8px 0px;
+}
+.news-thumbnail {
+    width: 23%;
+}
+
+button.read-more-button {
+    background: #ed6c02;
+    border: none;
+    color: #fff;
+    font-size: 10px;
+    padding: 4px 7px;
+    border-radius: 4PX;
+}
+
+
+.news-list {
+    width: 96%;
+    display: flex;
+    gap: 13px;
+}
+.news-list li{cursor: pointer;}
+.news-content {
+    width: 78%;
+}
+
+.news-left-section{width: 80%;}
+.liveNews_wrap iframe {
+    width: 100%;
+    height: 350px;
+}
+
+.liveNews_wrap p{
+        text-align: left;
+    padding: 0px;
+    margin: 0px;
+    font-size: 14px;
+
+}
+
+
+
+.newsHeading{
+    text-align: left;
+    padding: 5px 0px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+
+/**/
+.newsBoxContainer{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+li.newsBox-item {
+    display: flex;
+    flex-direction: column;
+    width: 18.6%;
+}
+
+
+
+@media only screen and (max-width:767px) {
+    .news-list {
+    width: 100%;
+    display: flex;
+    gap: 13px;
+    flex-direction: column;
+}
+
+li.newsBox-item{
+    width:48%
+}
+.news-left-section {
+    width: 90%;
+}
+
+}

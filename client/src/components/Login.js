@@ -33,7 +33,7 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const Login = ({ setIsLoggedIn }) => {
+const Login = ({ setIsLoggedIn, setUserName,setUserLocation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -42,14 +42,18 @@ const Login = ({ setIsLoggedIn }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://ssnnewsserver.onrender.com/login', { email, password });
-      setMessage(response.data.message);
-      if (response.data.message === 'Login successful') {
-        setIsLoggedIn(true);
-        navigate('/UserHome');
-      }
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, { email, password });
+        console.log(response);
+        setMessage(response.data.message);
+        if (response.data.message === 'Login successful') {
+          setIsLoggedIn(true);
+          
+          setUserName(response.data.userName); // Pass the user's name
+          setUserLocation(response.data.userLocation); // Pass the user's location
+          navigate('/UserHome');
+        }
     } catch (error) {
-      setMessage(error.response?.data?.message || 'Login failed');
+        setMessage(error.response?.data?.message || 'Login failed');
     }
   };
 

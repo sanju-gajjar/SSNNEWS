@@ -73,7 +73,12 @@ app.post('/login', async (req, res) => {
         if (!isPasswordValid) return res.status(401).send({ message: 'Invalid credentials' });
 
         const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
-        res.send({ message: 'Login successful', token });
+        res.send({ 
+            message: 'Login successful', 
+            token, 
+            userName: user.name, 
+            userLocation: user.location // Include location in the response
+        });
     } catch (err) {
         res.status(400).send({ message: 'Login failed', error: err.message });
     }
@@ -188,6 +193,40 @@ app.post('/news/comments/delete', async (req, res) => {
         res.status(400).send(err.message);
     }
 });
+
+app.post('/update-district', async (req, res) => {
+    const { userName, district } = req.body;
+
+    if (!userName || !district) {
+        return res.status(400).json({ error: 'userName and district are required' });
+    }
+
+    try {
+        // Find user by userName and update or create if not exists
+        const user = await User.findOneAndUpdate(
+            { userName },
+            { $set: { location: district } },
+            { new: true, upsert: true }
+        );
+
+        res.status(200).json({ message: 'District updated successfully', user });
+    } catch (error) {
+        console.error('Error updating district:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
 
 const PORT = process.env.PORT || 8080;
 

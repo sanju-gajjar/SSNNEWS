@@ -46,7 +46,7 @@ const Registration = () => {
         e.preventDefault();
         setLoading(true); // Start loading
         try {
-            const response = await axios.post('https://ssnnewsserver.onrender.com/register', { name, email, password });
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/register`, { name, email, password });
             setMessage(response.data.message);
             if (response.data.message === 'User registered successfully') {
                 navigate('/'); // Redirect to login page

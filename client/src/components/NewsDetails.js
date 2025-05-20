@@ -38,7 +38,7 @@ const NewsDetails = () => {
     useEffect(() => {
         let isMounted = true; // Add a flag to track if the component is mounted
         setLoading(true); // Start loading
-        axios.post('https://ssnnewsserver.onrender.com/news/details', { id })
+        axios.post(`${process.env.REACT_APP_API_URL}/news/details`, { id })
             .then(response => {
                 if (isMounted) { // Only update state if the component is still mounted
                     setNews(response.data);
@@ -56,14 +56,14 @@ const NewsDetails = () => {
     }, [id]);
 
     useEffect(() => {
-        axios.post('https://ssnnewsserver.onrender.com/news/comments', { id })
+        axios.post(`${process.env.REACT_APP_API_URL}/news/comments`, { id })
             .then(response => setComments(response.data))
             .catch(error => console.error(error));
     }, [id]);
 
     const handleAddComment = () => {
         if (newComment.trim()) {
-            axios.post('https://ssnnewsserver.onrender.com/news/comments/add', { id, user: 'Anonymous', comment: newComment })
+            axios.post(`${process.env.REACT_APP_API_URL}/news/comments/add`, { id, user: 'Anonymous', comment: newComment })
                 .then(response => {
                     setComments([...comments, response.data]);
                     setNewComment('');
@@ -73,7 +73,7 @@ const NewsDetails = () => {
     };
 
     const handleLike = () => {
-        axios.post('https://ssnnewsserver.onrender.com/news/like', { id })
+        axios.post(`${process.env.REACT_APP_API_URL}/news/like`, { id })
             .then(() => setLikes(likes + 1))
             .catch(error => console.error(error));
     };
