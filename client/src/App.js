@@ -10,6 +10,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import { ThemeGenerator } from './components/UI/Theme';
 import Footer from './components/Footer';
 import HeaderAfterLogin from './components/HeaderAfterLogin';
+import NotFound from './components/NotFound'; // Import the NotFound component
+import EditNewsPage from './components/EditNewsPage/EditNewsPage';
 
 const theme = ThemeGenerator();
 
@@ -33,6 +35,8 @@ const App = () => {
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/" element={<Login setIsLoggedIn={setIsLoggedIn} setUserName={setUserName} setUserLocation={setUserLocation} />} />
             <Route path="/register" element={<Registration />} />
+            <Route path="/edit-news" element={<EditNewsPage />} />
+            <Route path="*" element={<NotFound />} /> {/* Add a fallback route */}
           </Routes>
         </Router>
         <Footer />

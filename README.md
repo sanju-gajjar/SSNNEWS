@@ -76,3 +76,12 @@ The React application will be available at `http://localhost:3000` and the Expre
 ## Contributing
 
 Feel free to submit issues or pull requests for any improvements or features you would like to see in this project.
+
+
+To run project simply export two var as below 
+ export MONGODB_URL=<<MONGOURL>>
+ export REACT_APP_API_URL='http://localhost:8080' 
+
+ and open two terminal one in server and one client, 
+ run command in server : node index.js
+ and run commmand in client : npm run start

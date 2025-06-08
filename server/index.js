@@ -30,6 +30,12 @@ mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnifiedTop
 // Middleware
 app.use(bodyParser.json());
 
+// Middleware to log API calls
+app.use((req, res, next) => {
+    console.log(`[INFO] ${req.method} request received for ${req.url}`);
+    next();
+});
+
 // News Schema and Model
 const newsSchema = new mongoose.Schema({
     title: String,
@@ -57,8 +63,10 @@ app.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({ name, email, password: hashedPassword });
         await user.save();
+        console.log(`[INFO] User registered successfully: ${email}`);
         res.status(201).send({ message: 'User registered successfully' });
     } catch (err) {
+        console.error(`[ERROR] Registration failed for email: ${req.body.email}`, err);
         res.status(400).send({ message: 'Registration failed', error: err.message });
     }
 });
@@ -74,6 +82,7 @@ app.post('/login', async (req, res) => {
         if (!isPasswordValid) return res.status(401).send({ message: 'Invalid credentials' });
 
         const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
+        console.log(`[INFO] User logged in successfully: ${email}`);
         res.send({ 
             message: 'Login successful', 
             token, 
@@ -81,6 +90,7 @@ app.post('/login', async (req, res) => {
             userLocation: user.location // Include location in the response
         });
     } catch (err) {
+        console.error(`[ERROR] Login failed for email: ${req.body.email}`, err);
         res.status(400).send({ message: 'Login failed', error: err.message });
     }
 });
@@ -92,22 +102,43 @@ const News = mongoose.model('News', newsSchema);
 // Admin: Add news
 app.post('/news', async (req, res) => {
     try {
-        const news = new News(req.body);
+        const { title, title2, content, author, approvedby, tags, top, video, image, source } = req.body;
+
+        if (!title || !content || !author || !approvedby || !tags || !video || !image || !source) {
+            return res.status(400).send({ message: 'All fields are required.' });
+        }
+
+        const news = new News({
+            title,
+            title2,
+            content,
+            author,
+            approvedby,
+            tags,
+            top,
+            video,
+            image,
+            source
+        });
+
         await news.save();
+        console.log(`[INFO] News added successfully: ${title}`);
         res.status(201).send(news);
     } catch (err) {
-        res.status(400).send(err.message);
+        console.error(`[ERROR] Failed to add news: ${req.body.title}`, err);
+        res.status(400).send({ message: 'Failed to add news', error: err.message });
     }
 });
 
-// Admin: Update news
+// Admin: Update news by ID
 app.put('/news/:id', async (req, res) => {
     try {
         const news = await News.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!news) return res.status(404).send('News not found');
-        res.send(news);
-    } catch (err) {
-        res.status(400).send(err.message);
+        if (!news) return res.status(404).send({ message: 'News not found' });
+        res.status(200).send(news);
+    } catch (error) {
+        console.error('Failed to update news:', error);
+        res.status(500).send({ message: 'Internal server error' });
     }
 });
 
@@ -115,9 +146,11 @@ app.put('/news/:id', async (req, res) => {
 app.delete('/news/:id', async (req, res) => {
     try {
         const news = await News.findByIdAndDelete(req.params.id);
-        if (!news) return res.status(404).send('News not found');
-        res.send(news);
+        if (!news) return res.status(404).send({ message: 'News not found' });
+        console.log(`[INFO] News deleted successfully: ${req.params.id}`);
+        res.send({ message: 'News deleted successfully' });
     } catch (err) {
+        console.error(`[ERROR] Failed to delete news: ${req.params.id}`, err);
         res.status(400).send(err.message);
     }
 });
@@ -126,8 +159,10 @@ app.delete('/news/:id', async (req, res) => {
 app.get('/news', async (req, res) => {
     try {
         const news = await News.find();
+        console.log(`[INFO] Fetched all news`);
         res.send(news);
     } catch (err) {
+        console.error(`[ERROR] Failed to fetch news`, err);
         res.status(400).send(err.message);
     }
 });
@@ -137,8 +172,10 @@ app.post('/news/details', async (req, res) => {
     try {
         const news = await News.findById(req.body.id);
         if (!news) return res.status(404).send('News not found');
+        console.log(`[INFO] Fetched news details: ${req.body.id}`);
         res.send(news);
     } catch (err) {
+        console.error(`[ERROR] Failed to fetch news details: ${req.body.id}`, err);
         res.status(400).send(err.message);
     }
 });
@@ -150,8 +187,10 @@ app.post('/news/like', async (req, res) => {
         if (!news) return res.status(404).send('News not found');
         news.likes += 1;
         await news.save();
+        console.log(`[INFO] News liked successfully: ${req.body.id}`);
         res.send(news);
     } catch (err) {
+        console.error(`[ERROR] Failed to like news: ${req.body.id}`, err);
         res.status(400).send(err.message);
     }
 });
@@ -161,8 +200,10 @@ app.post('/news/comments', async (req, res) => {
     try {
         const news = await News.findById(req.body.id);
         if (!news) return res.status(404).send('News not found');
+        console.log(`[INFO] Fetched comments for news: ${req.body.id}`);
         res.send(news.comments);
     } catch (err) {
+        console.error(`[ERROR] Failed to fetch comments for news: ${req.body.id}`, err);
         res.status(400).send(err.message);
     }
 });
@@ -174,8 +215,10 @@ app.post('/news/comments/add', async (req, res) => {
         if (!news) return res.status(404).send('News not found');
         news.comments.push({ user: req.body.user, comment: req.body.comment });
         await news.save();
+        console.log(`[INFO] Comment added successfully for news: ${req.body.id}`);
         res.send(news.comments[news.comments.length - 1]);
     } catch (err) {
+        console.error(`[ERROR] Failed to add comment for news: ${req.body.id}`, err);
         res.status(400).send(err.message);
     }
 });
@@ -189,8 +232,29 @@ app.post('/news/comments/delete', async (req, res) => {
         if (commentIndex === -1) return res.status(404).send('Comment not found');
         news.comments.splice(commentIndex, 1);
         await news.save();
+        console.log(`[INFO] Comment deleted successfully for news: ${req.body.id}`);
         res.send(news);
     } catch (err) {
+        console.error(`[ERROR] Failed to delete comment for news: ${req.body.id}`, err);
+        res.status(400).send(err.message);
+    }
+});
+
+// Fetch news by date
+app.get('/news', async (req, res) => {
+    try {
+        const { date } = req.query;
+        const startOfDay = new Date(date).setHours(0, 0, 0, 0);
+        const endOfDay = new Date(date).setHours(23, 59, 59, 999);
+
+        const news = await News.find({
+            createdAt: { $gte: startOfDay, $lte: endOfDay },
+        });
+
+        console.log(`[INFO] Fetched news for date: ${date}`);
+        res.send(news);
+    } catch (err) {
+        console.error(`[ERROR] Failed to fetch news for date: ${req.query.date}`, err);
         res.status(400).send(err.message);
     }
 });
@@ -237,5 +301,9 @@ app.listen(PORT, '0.0.0.0', () => {
 
 // Redirect to login if path not found
 app.use((req, res) => {
-    res.redirect('/login');
+    if (req.path === '/login') {
+        res.status(404).send({ message: 'Page not found' });
+    } else {
+        res.redirect('/login');
+    }
 });

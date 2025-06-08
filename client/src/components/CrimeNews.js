@@ -3,7 +3,8 @@ import NewsHeading from './NewsHeading'
 import Para from './UI/Para'
 
 function CrimeNews({newList,handleReadMore}) {
-  const crime = newList.filter(e=> e.tags.includes('Crime'))
+  //const crime = newList.filter(e=> e.tags.includes('Crime'))
+  const crime = newList;
 
   return (
     <>

@@ -4,7 +4,8 @@ import Para from "./UI/Para";
 
 function TechNews({newList,handleReadMore}){
 
-    const tech = newList.filter(e=> e.tags.includes('Technology'))
+  //const tech = newList.filter(e=> e.tags.includes('Technology'))
+  const tech = newList;
     return(<>
      <NewsHeading heading={'Technology'}/>
      <ul className="newsBoxContainer">

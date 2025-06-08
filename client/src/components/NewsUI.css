@@ -1,4 +1,3 @@
-
 img{width: 100%;}
 ul.news-list-crime {
     width: 40%;
@@ -37,9 +36,10 @@ button.read-more-button {
 
 
 .news-list {
-    width: 96%;
+    width: 100%; /* Make the list responsive */
     display: flex;
     gap: 13px;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
 }
 .news-list li{cursor: pointer;}
 .news-content {
@@ -75,12 +75,14 @@ button.read-more-button {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    width: 100%; /* Ensure it fits the viewport */
 }
 
 li.newsBox-item {
     display: flex;
     flex-direction: column;
-    width: 18.6%;
+    flex: 1 1 calc(50% - 10px); /* Adjust width dynamically */
+    box-sizing: border-box; /* Include padding in width calculations */
 }
 
 
@@ -94,7 +96,7 @@ li.newsBox-item {
 }
 
 li.newsBox-item{
-    width:48%
+    width:100%; /* Full width for smaller screens */
 }
 .news-left-section {
     width: 90%;
