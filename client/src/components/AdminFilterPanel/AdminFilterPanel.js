@@ -20,7 +20,7 @@ function AdminFilterPanel({ category, onCategoryChange }) {
 
   const fetchNews = async (date) => {
     try {
-      const response = await axios.get(`/news?date=${date}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/news`, { date });
       setNewsList(response.data);
     } catch (error) {
       console.error('Failed to fetch news:', error);

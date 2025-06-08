@@ -131,9 +131,9 @@ app.post('/news', async (req, res) => {
 });
 
 // Admin: Update news by ID
-app.put('/news/:id', async (req, res) => {
+app.post('/news/:id', async (req, res) => {
     try {
-        const news = await News.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const news = await News.findByIdAndUpdate(req.body._id, req.body, { new: true });
         if (!news) return res.status(404).send({ message: 'News not found' });
         res.status(200).send(news);
     } catch (error) {
@@ -190,7 +190,7 @@ app.post('/news/like', async (req, res) => {
         console.log(`[INFO] News liked successfully: ${req.body.id}`);
         res.send(news);
     } catch (err) {
-        console.error(`[ERROR] Failed to like news: ${req.body.id}`, err);
+        console.error(`[ERROR] Failed to like news: ${news}`, err);
         res.status(400).send(err.message);
     }
 });
@@ -240,10 +240,10 @@ app.post('/news/comments/delete', async (req, res) => {
     }
 });
 
-// Fetch news by date
-app.get('/news', async (req, res) => {
+// Fetch news by date (POST)
+app.post('/news', async (req, res) => {
     try {
-        const { date } = req.query;
+        const { date } = req.body;
         const startOfDay = new Date(date).setHours(0, 0, 0, 0);
         const endOfDay = new Date(date).setHours(23, 59, 59, 999);
 
@@ -254,7 +254,7 @@ app.get('/news', async (req, res) => {
         console.log(`[INFO] Fetched news for date: ${date}`);
         res.send(news);
     } catch (err) {
-        console.error(`[ERROR] Failed to fetch news for date: ${req.query.date}`, err);
+        console.error(`[ERROR] Failed to fetch news for date: ${req.body.date}`, err);
         res.status(400).send(err.message);
     }
 });
@@ -280,17 +280,6 @@ app.post('/update-district', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-
-
-
-
-
-
-
-
-
-
 
 
 const PORT = process.env.PORT || 8080;

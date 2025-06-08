@@ -12,6 +12,7 @@ import Footer from './components/Footer';
 import HeaderAfterLogin from './components/HeaderAfterLogin';
 import NotFound from './components/NotFound'; // Import the NotFound component
 import EditNewsPage from './components/EditNewsPage/EditNewsPage';
+import BottomPanel from './components/BottomPanel/BottomPanel';
 
 const theme = ThemeGenerator();
 
@@ -40,6 +41,7 @@ const App = () => {
           </Routes>
         </Router>
         <Footer />
+       
       </div>
     </ThemeProvider>
   );

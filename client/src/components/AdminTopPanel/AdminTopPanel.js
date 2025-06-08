@@ -37,7 +37,7 @@ function AdminTopPanel() {
     }
 
     try {
-      const response = await axios.post('/news', { ...formData, tags: tags.split(',') });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/news`, { ...formData, tags: tags.split(',') });
       alert('News added successfully!');
       handleClose();
     } catch (error) {

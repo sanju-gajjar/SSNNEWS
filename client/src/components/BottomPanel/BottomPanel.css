@@ -1,0 +1,11 @@
+.bottomPanel {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+
+    font-size: 14px;
+    height: 10px;
+}
