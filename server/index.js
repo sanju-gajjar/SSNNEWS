@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt'); // Add this line
 const jwt = require('jsonwebtoken'); // Add this line
 const axios = require('axios'); // For external API requests
-
+const path = require('path');
 const corsOptions = {
     origin: ['http://localhost:3000', 'https://ssanews.onrender.com'], // Allow both origins
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS for preflight
@@ -14,6 +14,7 @@ const corsOptions = {
     credentials: true, // Allow credentials if needed
 };
 
+app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 app.use(cors(corsOptions)); // Apply CORS middleware
 
 // Handle preflight requests globally
@@ -443,6 +444,9 @@ app.post('/external-news/fetch-and-store', async (req, res) => {
         console.error('[ERROR] Failed to fetch and store external news', err);
         res.status(500).send({ message: 'Failed to fetch and store external news', error: err.message });
     }
+});
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
 });
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server listening on port ${PORT}`);
