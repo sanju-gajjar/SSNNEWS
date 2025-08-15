@@ -28,20 +28,25 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <div className="App">
-        {isLoggedIn && <HeaderAfterLogin userName={userName} userLocation={userLocation} />}
         <Router>
+          {isLoggedIn && (
+            <HeaderAfterLogin
+              userName={userName}
+              userLocation={userLocation}
+              burgerMenu // pass a prop to enable burger menu mode
+            />
+          )}
           <Routes>
             <Route path="/UserHome" element={<PrivateRoute><NewsList /></PrivateRoute>} />
             <Route path="/news/:id" element={<NewsDetails />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/" element={<Login setIsLoggedIn={setIsLoggedIn} setUserName={setUserName} setUserLocation={setUserLocation} />} />
             <Route path="/register" element={<Registration />} />
-            <Route path="/edit-news" element={<EditNewsPage />} />
+            <Route path="/news/:id/update" element={<EditNewsPage />} />
             <Route path="*" element={<NotFound />} /> {/* Add a fallback route */}
           </Routes>
         </Router>
         <Footer />
-       
       </div>
     </ThemeProvider>
   );

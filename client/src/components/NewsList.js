@@ -49,17 +49,19 @@ import TechNews from './TechNews';
 import CrimeNews from './CrimeNews';
 import SportsNews from './SportsNews';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const NewsList = () => {
     const [newsList, setNewsList] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_URL}/news`)
+        axios.get(`${API_URL}/news`)
             .then(response => setNewsList(response.data))
             .catch(error => console.error(error));
     }, []);
 
-    const handleReadMore = (id) => {
+   const handleReadMore = (id) => {
         navigate(`/news/${id}`);
     };
 

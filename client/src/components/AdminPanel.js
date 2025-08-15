@@ -5,6 +5,8 @@ import { Grid } from '@mui/material';
 import AdminRightPanel from './AdminRightPanel/AdminRightPanel';
 import Loader from './Loader'; // Import the Loader component
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const AdminPanel = () => {
     const [formData, setFormData] = useState({ title: '', content: '', author: '' });
     const [loading, setLoading] = useState(false); // Add loading state
@@ -15,11 +17,11 @@ const AdminPanel = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setLoading(true); // Start loading
-        axios.post(`${process.env.REACT_APP_API_URL}/news`, formData)
+        setLoading(true);
+        axios.post(`${API_URL}/news`, formData)
             .then(response => alert('News added successfully'))
             .catch(error => console.error(error))
-            .finally(() => setLoading(false)); // Stop loading
+            .finally(() => setLoading(false));
     };
 
     return (

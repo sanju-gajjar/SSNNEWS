@@ -9,6 +9,8 @@ import ButtonBox from './UI/ButtonBox';
 import Para from './UI/Para';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const CustomTextField = styled(TextField)({
   "& div.MuiFormControl-root": {
     width: '100% !important',
@@ -42,7 +44,7 @@ const Login = ({ setIsLoggedIn, setUserName,setUserLocation }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, { email, password });
+        const response = await axios.post(`${API_URL}/login`, { email, password });
         console.log(response);
         setMessage(response.data.message);
         if (response.data.message === 'Login successful') {

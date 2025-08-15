@@ -6,6 +6,8 @@ import ColorSlider from '../UI/ColorSlider';
 import AdminTopCss from './AdminTopPanel.css';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function AdminTopPanel() {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -37,7 +39,7 @@ function AdminTopPanel() {
     }
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/news`, { ...formData, tags: tags.split(',') });
+      const response = await axios.post(`${API_URL}/news`, { ...formData, tags: tags.split(',') });
       alert('News added successfully!');
       handleClose();
     } catch (error) {

@@ -7,6 +7,8 @@ import { Grid, Button } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function AdminFilterPanel({ category, onCategoryChange }) {
   const navigate = useNavigate();
   const [arrange, setArrange] = useState('');
@@ -20,7 +22,7 @@ function AdminFilterPanel({ category, onCategoryChange }) {
 
   const fetchNews = async (date) => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/news`, { date });
+      const response = await axios.get(`${API_URL}/news`, { date });
       setNewsList(response.data);
     } catch (error) {
       console.error('Failed to fetch news:', error);
@@ -49,8 +51,8 @@ function AdminFilterPanel({ category, onCategoryChange }) {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/news/${id}`);
-      fetchNews(selectedDate); // Refresh news list after deletion
+      await axios.delete(`${API_URL}/news/${id}`);
+      fetchNews(selectedDate);
     } catch (error) {
       console.error('Failed to delete news:', error);
     }

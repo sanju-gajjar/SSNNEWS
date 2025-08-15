@@ -21,8 +21,8 @@ function EditNewsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/news/update`, formData); // Change to POST
-      navigate('/admin'); // Redirect back to admin page
+      await axios.post(`${process.env.REACT_APP_API_URL}/news/${formData._id}/update`, formData);
+      navigate('/admin');
     } catch (error) {
       console.error('Failed to update news:', error);
     }

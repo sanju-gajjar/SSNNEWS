@@ -22,8 +22,9 @@ app.options('*', cors(corsOptions));
 require('dotenv').config();
 
 const jwtSecret = process.env.JWT_SECRET || 'defaultSecretKey';
+const mongoUrl = process.env.MONGODB_URL || "mongodb+srv://swadeshsandesh:2t9Z4PmygBU41RYV@clusterssn.rasxlii.mongodb.net/?retryWrites=true&w=majority&appName=ClusterSSN";
 
-mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Could not connect to MongoDB', err));
 
@@ -130,31 +131,6 @@ app.post('/news', async (req, res) => {
     }
 });
 
-// Admin: Update news by ID
-app.post('/news/:id', async (req, res) => {
-    try {
-        const news = await News.findByIdAndUpdate(req.body._id, req.body, { new: true });
-        if (!news) return res.status(404).send({ message: 'News not found' });
-        res.status(200).send(news);
-    } catch (error) {
-        console.error('Failed to update news:', error);
-        res.status(500).send({ message: 'Internal server error' });
-    }
-});
-
-// Admin: Delete news
-app.delete('/news/:id', async (req, res) => {
-    try {
-        const news = await News.findByIdAndDelete(req.params.id);
-        if (!news) return res.status(404).send({ message: 'News not found' });
-        console.log(`[INFO] News deleted successfully: ${req.params.id}`);
-        res.send({ message: 'News deleted successfully' });
-    } catch (err) {
-        console.error(`[ERROR] Failed to delete news: ${req.params.id}`, err);
-        res.status(400).send(err.message);
-    }
-});
-
 // User: Get all news
 app.get('/news', async (req, res) => {
     try {
@@ -167,15 +143,41 @@ app.get('/news', async (req, res) => {
     }
 });
 
-// User: Get news details
-app.post('/news/details', async (req, res) => {
+// User: Get news details by ID (GET)
+app.get('/news/:id', async (req, res) => {
     try {
-        const news = await News.findById(req.body.id);
+        const news = await News.findById(req.params.id);
+        console.log(`[INFO] Fetching news details for ID: ${req.params.id}`);
         if (!news) return res.status(404).send('News not found');
-        console.log(`[INFO] Fetched news details: ${req.body.id}`);
+        console.log(`[INFO] Fetched news details: ${req.params.id}`);
         res.send(news);
     } catch (err) {
-        console.error(`[ERROR] Failed to fetch news details: ${req.body.id}`, err);
+        console.error(`[ERROR] Failed to fetch news details: ${req.params.id}`, err);
+        res.status(400).send(err.message);
+    }
+});
+
+// Admin: Update news by ID (POST)
+app.post('/news/:id/update', async (req, res) => {
+    try {
+        const news = await News.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!news) return res.status(404).send({ message: 'News not found' });
+        res.status(200).send(news);
+    } catch (error) {
+        console.error('Failed to update news:', error);
+        res.status(500).send({ message: 'Internal server error' });
+    }
+});
+
+// Admin: Delete news by ID (DELETE)
+app.delete('/news/:id', async (req, res) => {
+    try {
+        const news = await News.findByIdAndDelete(req.params.id);
+        if (!news) return res.status(404).send({ message: 'News not found' });
+        console.log(`[INFO] News deleted successfully: ${req.params.id}`);
+        res.send({ message: 'News deleted successfully' });
+    } catch (err) {
+        console.error(`[ERROR] Failed to delete news: ${req.params.id}`, err);
         res.status(400).send(err.message);
     }
 });
@@ -183,14 +185,16 @@ app.post('/news/details', async (req, res) => {
 // User: Like a news
 app.post('/news/like', async (req, res) => {
     try {
-        const news = await News.findById(req.body.id);
+        const news = await News.findByIdAndUpdate(
+            req.body.id,
+            { $inc: { likes: 1 } },
+            { new: true }
+        );
         if (!news) return res.status(404).send('News not found');
-        news.likes += 1;
-        await news.save();
         console.log(`[INFO] News liked successfully: ${req.body.id}`);
         res.send(news);
     } catch (err) {
-        console.error(`[ERROR] Failed to like news: ${news}`, err);
+        console.error(`[ERROR] Failed to like news:`, err);
         res.status(400).send(err.message);
     }
 });
@@ -211,10 +215,12 @@ app.post('/news/comments', async (req, res) => {
 // User: Add a comment to a news
 app.post('/news/comments/add', async (req, res) => {
     try {
-        const news = await News.findById(req.body.id);
+        const news = await News.findByIdAndUpdate(
+            req.body.id,
+            { $push: { comments: { user: req.body.user, comment: req.body.comment } } },
+            { new: true }
+        );
         if (!news) return res.status(404).send('News not found');
-        news.comments.push({ user: req.body.user, comment: req.body.comment });
-        await news.save();
         console.log(`[INFO] Comment added successfully for news: ${req.body.id}`);
         res.send(news.comments[news.comments.length - 1]);
     } catch (err) {
@@ -226,12 +232,12 @@ app.post('/news/comments/add', async (req, res) => {
 // User: Delete a comment from a news
 app.post('/news/comments/delete', async (req, res) => {
     try {
-        const news = await News.findById(req.body.id);
+        const news = await News.findByIdAndUpdate(
+            req.body.id,
+            { $pull: { comments: { _id: req.body.commentId } } },
+            { new: true }
+        );
         if (!news) return res.status(404).send('News not found');
-        const commentIndex = news.comments.findIndex(comment => comment._id.toString() === req.body.commentId);
-        if (commentIndex === -1) return res.status(404).send('Comment not found');
-        news.comments.splice(commentIndex, 1);
-        await news.save();
         console.log(`[INFO] Comment deleted successfully for news: ${req.body.id}`);
         res.send(news);
     } catch (err) {

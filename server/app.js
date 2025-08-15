@@ -8,7 +8,7 @@ app.use(express.json()); // Middleware to parse JSON
 
 // Middleware to log API calls
 app.use((req, res, next) => {
-    console.log(`[INFO] ${req.method} request received for ${req.url}`);
+    console.log(`[INFO] ${req.method} request received for ${req.originalUrl}`);
     next();
 });
 

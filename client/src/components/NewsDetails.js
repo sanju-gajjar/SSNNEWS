@@ -26,6 +26,8 @@ const ModalBox = styled(Box)({
     padding: '1rem',
 });
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const NewsDetails = () => {
     const { id } = useParams();
     const [news, setNews] = useState(null);
@@ -38,14 +40,16 @@ const NewsDetails = () => {
     useEffect(() => {
         let isMounted = true; // Add a flag to track if the component is mounted
         setLoading(true); // Start loading
-        axios.post(`${process.env.REACT_APP_API_URL}/news/details`, { id })
+        axios.get(`${API_URL}/news/${id}`)
             .then(response => {
                 if (isMounted) { // Only update state if the component is still mounted
                     setNews(response.data);
                     setLikes(response.data.likes);
                 }
             })
-            .catch(error => console.error(error))
+            .catch(error => {
+                console.error(error);
+            })
             .finally(() => {
                 if (isMounted) setLoading(false); // Stop loading only if mounted
             });
@@ -56,14 +60,14 @@ const NewsDetails = () => {
     }, [id]);
 
     useEffect(() => {
-        axios.post(`${process.env.REACT_APP_API_URL}/news/comments`, { id })
+        axios.post(`${API_URL}/news/comments`, { id })
             .then(response => setComments(response.data))
             .catch(error => console.error(error));
     }, [id]);
 
     const handleAddComment = () => {
         if (newComment.trim()) {
-            axios.post(`${process.env.REACT_APP_API_URL}/news/comments/add`, { id, user: 'Anonymous', comment: newComment })
+            axios.post(`${API_URL}/news/comments/add`, { id, user: 'Anonymous', comment: newComment })
                 .then(response => {
                     setComments([...comments, response.data]);
                     setNewComment('');
@@ -73,7 +77,7 @@ const NewsDetails = () => {
     };
 
     const handleLike = () => {
-        axios.post(`${process.env.REACT_APP_API_URL}/news/like`, { id })
+        axios.post(`${API_URL}/news/like`, { id })
             .then(() => setLikes(likes + 1))
             .catch(error => console.error(error));
     };

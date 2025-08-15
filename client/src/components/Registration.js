@@ -34,6 +34,8 @@ const CustomTextField = styled(TextField)({
     },
 });
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const Registration = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -44,17 +46,17 @@ const Registration = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // Start loading
+        setLoading(true);
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/register`, { name, email, password });
+            const response = await axios.post(`${API_URL}/register`, { name, email, password });
             setMessage(response.data.message);
             if (response.data.message === 'User registered successfully') {
-                navigate('/'); // Redirect to login page
+                navigate('/');
             }
         } catch (error) {
             setMessage(error.response?.data?.message || 'Registration failed');
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false);
         }
     };
 
