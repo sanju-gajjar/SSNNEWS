@@ -32,6 +32,11 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 // Middleware
 app.use(bodyParser.json());
 
+// Health check endpoint
+app.get('/ping', (req, res) => {
+    res.status(200).send({ status: 'ok', message: 'pong' });
+});
+
 // Middleware to log API calls
 app.use((req, res, next) => {
     console.log(`[INFO] ${req.method} request received for ${req.url}`);
