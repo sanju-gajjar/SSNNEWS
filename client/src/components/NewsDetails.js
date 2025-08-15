@@ -77,9 +77,12 @@ const NewsDetails = ({ userName, userLocation }) => {
     const [visibleComments, setVisibleComments] = useState(10);
     const [liked, setLiked] = useState(false);
     const [showAuthDialog, setShowAuthDialog] = useState(false);
+    const [allNewsIds, setAllNewsIds] = useState([]);
 
-    // Helper to check if user is logged in
-    const isLoggedIn = !!userName;
+    // Use localStorage for auth state
+    const isLoggedIn = !!localStorage.getItem('isLoggedIn');
+    const storedUserName = localStorage.getItem('userName') || userName;
+    const storedUserLocation = localStorage.getItem('userLocation') || userLocation;
 
     useEffect(() => {
         let isMounted = true;
@@ -98,7 +101,12 @@ const NewsDetails = ({ userName, userLocation }) => {
             .finally(() => {
                 if (isMounted) setLoading(false);
             });
-
+        // Fetch all news IDs for navigation
+        axios.get(`${API_URL}/news`)
+            .then(response => {
+                if (isMounted) setAllNewsIds(response.data);
+            })
+            .catch(error => console.error(error));
         return () => {
             isMounted = false;
         };
@@ -121,7 +129,7 @@ const NewsDetails = ({ userName, userLocation }) => {
     const handleAddComment = () => {
         if (!handleRequireAuth('comment')) return;
         if (newComment.trim()) {
-            axios.post(`${API_URL}/news/comments/add`, { id, user: userName || 'Anonymous', comment: newComment })
+            axios.post(`${API_URL}/news/comments/add`, { id, user: storedUserName || 'Anonymous', comment: newComment })
                 .then(response => {
                     setComments([response.data, ...comments]);
                     setNewComment('');
@@ -173,6 +181,14 @@ const NewsDetails = ({ userName, userLocation }) => {
 
     if (!news) return <Loader />;
 
+    // Navigation logic
+    const currentIndex = allNewsIds.findIndex(nid => String(nid._id) === String(id));
+    const prevId = currentIndex > 0 ? allNewsIds[currentIndex - 1] : null;
+    const nextId = currentIndex < allNewsIds.length - 1 ? allNewsIds[currentIndex + 1] : null;
+    const handleGoBack = () => window.history.back();
+    const handleGoHome = () => window.location.href = '/UserHome';
+    const handleGoToNews = (nid) => window.location.href = `/news/${nid._id}`;
+
     return (
         <Box sx={{
             padding: { xs: 1, sm: 3 },
@@ -182,6 +198,49 @@ const NewsDetails = ({ userName, userLocation }) => {
             borderRadius: { xs: 0, sm: 3 },
             minHeight: '100vh'
         }}>
+            {/* Navigation Bar */}
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mb: 2,
+                px: 1,
+                py: 1,
+                background: '#fff',
+                borderRadius: 3,
+                boxShadow: theme.shadows[2],
+                position: 'sticky',
+                top: 0,
+                zIndex: 20
+            }}>
+                {/* <Button variant="outlined" color="primary" onClick={handleGoBack} sx={{ borderRadius: 2, fontWeight: 600 }}>
+                    Back
+                </Button> */}
+                <Stack direction="row" spacing={1}>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        disabled={!prevId}
+                        onClick={() => handleGoToNews(prevId)}
+                        sx={{ borderRadius: 2, fontWeight: 600 }}
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        disabled={!nextId}
+                        onClick={() => handleGoToNews(nextId)}
+                        sx={{ borderRadius: 2, fontWeight: 600 }}
+                    >
+                        Next
+                    </Button>
+                </Stack>
+                <Button variant="outlined" color="primary" onClick={handleGoHome} sx={{ borderRadius: 2, fontWeight: 600 }}>
+                    Home
+                </Button>
+            </Box>
+            {/* News Card */}
             <Card sx={{
                 mb: 2,
                 borderRadius: 4,

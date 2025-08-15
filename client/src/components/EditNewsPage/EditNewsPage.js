@@ -1,17 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Grid, TextField, Button, IconButton } from '@mui/material';
 import { Visibility } from '@mui/icons-material';
 import axios from 'axios';
-
+const API_URL = process.env.REACT_APP_API_URL;
 function EditNewsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const newsData = location.state?.newsData || {}; // Get news data from navigation state
-
-  const [formData, setFormData] = useState(newsData);
+  const params = new URLSearchParams(location.search);
+  const idFromQuery = params.get('id');
+  const newsDataFromState = location.state?.newsData;
+  const [formData, setFormData] = useState(newsDataFromState || {});
   const [previewImage, setPreviewImage] = useState('');
   const [previewLink, setPreviewLink] = useState('');
+
+  useEffect(() => {
+    // If no newsData in state and id in query, fetch news
+    if (!newsDataFromState && idFromQuery) {
+      const fetchNews = async () => {
+        try {
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/news/${idFromQuery}`);
+          setFormData(response.data);
+        } catch (error) {
+          console.error('Failed to fetch news:', error);
+        }
+      };
+      fetchNews();
+    }
+  }, [newsDataFromState, idFromQuery]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,7 +37,7 @@ function EditNewsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/news/${formData._id}/update`, formData);
+      await axios.post(`${API_URL}/news/${formData._id}/update`, formData);
       navigate('/admin');
     } catch (error) {
       console.error('Failed to update news:', error);

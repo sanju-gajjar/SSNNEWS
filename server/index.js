@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt'); // Add this line
 const jwt = require('jsonwebtoken'); // Add this line
+const axios = require('axios'); // For external API requests
 
 const corsOptions = {
     origin: ['http://localhost:3000', 'https://ssanews.onrender.com'], // Allow both origins
@@ -22,7 +23,7 @@ app.options('*', cors(corsOptions));
 require('dotenv').config();
 
 const jwtSecret = process.env.JWT_SECRET || 'defaultSecretKey';
-const mongoUrl = process.env.MONGODB_URL || "mongodb+srv://swadeshsandesh:2t9Z4PmygBU41RYV@clusterssn.rasxlii.mongodb.net/?retryWrites=true&w=majority&appName=ClusterSSN";
+const mongoUrl = process.env.MONGODB_URL ;
 
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
@@ -54,6 +55,37 @@ const newsSchema = new mongoose.Schema({
     comments: [{ user: String, comment: String }],
     createdAt: { type: Date, default: Date.now }
 });
+
+// External News Schema and Model
+const externalNewsSchema = new mongoose.Schema({
+     article_id: { type: String },
+  title: { type: String },
+  link: { type: String },
+  keywords: [{ type: String }],
+  creator: [{ type: String }],
+  description: { type: String },
+  content: { type: String },
+  pubDate: { type: String },
+  pubDateTZ: { type: String },
+  image_url: { type: String },
+  video_url: { type: String },
+  source_id: { type: String },
+  source_name: { type: String },
+  source_priority: { type: Number },
+  source_url: { type: String },
+  source_icon: { type: String },
+  language: { type: String },
+  country: [{ type: String }],
+  category: [{ type: String }],
+  sentiment: { type: String },
+  sentiment_stats: { type: String },
+  ai_tag: { type: String },
+  ai_region: { type: String },
+  ai_org: { type: String },
+  ai_summary: { type: String },
+  ai_content: { type: String },
+  duplicate: { type: Boolean }
+}, { strict: false });
 
 // User Schema and Model
 const userSchema = new mongoose.Schema({
@@ -106,6 +138,7 @@ app.post('/login', async (req, res) => {
 
 
 const News = mongoose.model('News', newsSchema);
+const ExternalNews = mongoose.model('ExternalNews', externalNewsSchema);
 
 // Routes
 // Admin: Add news
@@ -314,7 +347,7 @@ app.post('/update-district', async (req, res) => {
     try {
         // Find user by userName and update or create if not exists
         const user = await User.findOneAndUpdate(
-            { userName },
+            { name:userName },
             { $set: { location: district } },
             { new: true, upsert: true }
         );
@@ -329,6 +362,83 @@ app.post('/update-district', async (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 
+// Combined external news fetch and store in MongoDB
+app.post('/external-news/fetch-and-store', async (req, res) => {
+    try {
+        const apiKey = process.env.NEWS_API_KEY;
+        const today = new Date();
+        const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+        const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+        // Check if today's external news already exists
+        const existingNews = await ExternalNews.find({
+            createdAt: { $gte: startOfDay, $lte: endOfDay }
+        });
+        if (existingNews && existingNews.length > 0) {
+            return res.send({ count: existingNews.length, message: 'External news already fetched for today', news: existingNews });
+        }
+
+        // If not, fetch from external API
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const urls = [
+            `https://newsdata.io/api/1/latest?country=in&language=hi&apikey=${apiKey}`
+        ];
+
+        // Fetch each URL sequentially with a delay between requests
+        const responses = [];
+        for (const url of urls) {
+            const response = await axios.get(url);
+            responses.push(response);
+            // Wait for 500ms between requests to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+        let allNews = [];
+        responses.forEach(resp => {
+            if (resp.data && Array.isArray(resp.data.results)) {
+                allNews = allNews.concat(resp.data.results);
+            }
+        });
+
+        // Store in MongoDB with createdAt as today and source as 'external'
+        const now = new Date();
+        const newsDocs = allNews.map(n => ({
+            article_id: n.article_id || '',
+            title: n.title || '',
+            link: n.link || '',
+            keywords: Array.isArray(n.keywords) ? n.keywords : (n.keywords ? [n.keywords] : []),
+            creator: Array.isArray(n.creator) ? n.creator : (n.creator ? [n.creator] : []),
+            description: n.description || '',
+            content: n.content || '',
+            pubDate: n.pubDate || '',
+            pubDateTZ: n.pubDateTZ || '',
+            image_url: n.image_url || '',
+            video_url: n.video_url || '',
+            source_id: n.source_id || '',
+            source_name: n.source_name || '',
+            source_priority: typeof n.source_priority === 'number' ? n.source_priority : 0,
+            source_url: n.source_url || '',
+            source_icon: n.source_icon || '',
+            language: n.language || '',
+            country: Array.isArray(n.country) ? n.country : (n.country ? [n.country] : []),
+            category: Array.isArray(n.category) ? n.category : (n.category ? [n.category] : []),
+            sentiment: n.sentiment || '',
+            sentiment_stats: n.sentiment_stats || '',
+            ai_tag: n.ai_tag || '',
+            ai_region: n.ai_region || '',
+            ai_org: n.ai_org || '',
+            ai_summary: n.ai_summary || '',
+            ai_content: n.ai_content || '',
+            duplicate: typeof n.duplicate === 'boolean' ? n.duplicate : false,
+            createdAt: now
+        }));
+
+        await ExternalNews.insertMany(newsDocs);
+        res.send({ count: newsDocs.length, message: 'External news fetched and stored', news: newsDocs });
+    } catch (err) {
+        console.error('[ERROR] Failed to fetch and store external news', err);
+        res.status(500).send({ message: 'Failed to fetch and store external news', error: err.message });
+    }
+});
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server listening on port ${PORT}`);
 });

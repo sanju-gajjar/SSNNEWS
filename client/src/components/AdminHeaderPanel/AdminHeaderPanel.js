@@ -25,8 +25,13 @@ function AdminHeaderPanel(props) {
     const handleClose = () => {
       setAnchorEl(null);
     };
-
-    const theme = useTheme()
+    const theme = useTheme();
+    const handleLogout = () => {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userLocation');
+      window.location.href = '/';
+    };
   return (
     <>
         <Paper elevation={3} sx={{ mt: 2, textAlign: 'right', p: 1 }}>
@@ -99,7 +104,7 @@ function AdminHeaderPanel(props) {
           </ListItemIcon>
           Settings
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => { handleLogout(); handleClose(); }}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>

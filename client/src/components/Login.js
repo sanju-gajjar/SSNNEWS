@@ -45,13 +45,15 @@ const Login = ({ setIsLoggedIn, setUserName,setUserLocation }) => {
     e.preventDefault();
     try {
         const response = await axios.post(`${API_URL}/login`, { email, password });
-        console.log(response);
         setMessage(response.data.message);
         if (response.data.message === 'Login successful') {
+          // Set localStorage values
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userName', response.data.userName);
+          localStorage.setItem('userLocation', response.data.userLocation);
           setIsLoggedIn(true);
-          
-          setUserName(response.data.userName); // Pass the user's name
-          setUserLocation(response.data.userLocation); // Pass the user's location
+          setUserName(response.data.userName);
+          setUserLocation(response.data.userLocation);
           navigate('/UserHome');
         }
     } catch (error) {

@@ -17,24 +17,28 @@ let menu = [
 ]
 
 function AdminLeftPanel() {
-    
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userLocation');
+    window.location.href = '/';
+  };
   return (
     <>
         <Paper elevation={4} className='adminWrap'>
             <section className='logoAdmin'>
                       <img src={logo} alt='logo' className='' />
             </section>
-
-            {/* <Card sx={{maxWidth:200}} className='profileBox'>
-                    <CardMedia component='div'>
-                    <AccountBoxIcon sx={{fontSize:'80px', color:'#ccc'}}/>
-                    <Para  variant='h5'  text='John Selva' color='primary'/>
-                    </CardMedia>
-            </Card> */}
             <ul className='menuWrap'>
             {
                 menu.map((e,index)=> (
-                    <li key={index}><Link> <span>{e.icon}</span>{e.name}</Link></li>
+                    <li key={index}>
+                      {e.name === 'Logout' ? (
+                        <Link onClick={handleLogout}> <span>{e.icon}</span>{e.name}</Link>
+                      ) : (
+                        <Link> <span>{e.icon}</span>{e.name}</Link>
+                      )}
+                    </li>
                 ))
             }
             </ul>

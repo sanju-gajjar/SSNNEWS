@@ -6,21 +6,30 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import axios from 'axios';
 import logo from '../images/newLogo-transperant.png';
 import { useNavigate } from 'react-router-dom';
-
+const API_URL = process.env.REACT_APP_API_URL;
 const HeaderAfterLogin = ({ userName, userLocation: initialDistrict, burgerMenu }) => {
-    const [anchorEl, setAnchorEl] = useState(null);
+    const [anchorElLocation, setAnchorElLocation] = useState(null);
+    const [anchorElUser, setAnchorElUser] = useState(null);
     const [isUpdatingDistrict, setIsUpdatingDistrict] = useState(false);
-    const [district, setDistrict] = useState(initialDistrict || '');
+    const [district, setDistrict] = useState(localStorage.getItem('userLocation'));
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     const navigate = useNavigate();
 
     const handleLocationClick = (event) => {
-        setAnchorEl(event.currentTarget);
+        setAnchorElLocation(event.currentTarget);
     };
 
     const handleLocationClose = () => {
-        setAnchorEl(null);
+        setAnchorElLocation(null);
+    };
+
+    const handleUserMenuClick = (event) => {
+        setAnchorElUser(event.currentTarget);
+    };
+
+    const handleUserMenuClose = () => {
+        setAnchorElUser(null);
     };
 
     const handleDistrictSelect = async (district) => {
@@ -28,10 +37,10 @@ const HeaderAfterLogin = ({ userName, userLocation: initialDistrict, burgerMenu 
         setIsUpdatingDistrict(true);
 
         setDistrict(district);
-        setAnchorEl(null);
+        setAnchorElLocation(null);
 
         try {
-            await axios.post('/api/user/update-district', { district, userName });
+            await axios.post(`${API_URL}/update-district`, { district, userName });
             alert(`District updated to ${district}`);
         } catch (error) {
             console.error('Error updating district:', error);
@@ -50,34 +59,56 @@ const HeaderAfterLogin = ({ userName, userLocation: initialDistrict, burgerMenu 
     ];
 
     const menuRoutes = {
-        HOME: '/UserHome',
-        GUJARAT: '/gujarat',
-        SPORTS: '/sports',
-        LIFESTYLE: '/lifestyle',
-        KNOWLEDGE: '/knowledge'
+        HOME: '/UserHome'
     };
 
-    if (burgerMenu) {
+    if (userName && burgerMenu) {
         return (
             <>
-                <AppBar position="static" sx={{ backgroundColor: '#f5f5f5', color: '#000', boxShadow: 'none', borderBottom: '1px solid #ddd' }}>
-                    <Toolbar>
+            <AppBar position="static" sx={{ backgroundColor: '#f5f5f5', color: '#000', boxShadow: 'none', borderBottom: '1px solid #ddd' }}>
+                <Toolbar>
                         <IconButton edge="start" color="inherit" onClick={() => setDrawerOpen(true)}>
                             <MenuIcon />
                         </IconButton>
-                        <Box component="img" src={logo} alt="Logo" sx={{ width: 50, height: 50, mx: 2 }} />
+                <Box component="img" src={logo} alt="Logo" sx={{ width: 50, height: 50, mx: 2 }} />
                         <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', textAlign: 'left' }} />
-                        <IconButton color="inherit" onClick={handleLocationClick}>
-                            <LocationOnIcon />
-                            <Typography variant="body2" sx={{ ml: 1 }}>
-                                {district || 'Select Location'}
-                            </Typography>
-                        </IconButton>
-                        <IconButton color="inherit">
-                            <AccountCircleIcon />
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
+                <IconButton color="inherit" onClick={handleLocationClick}>
+                    <LocationOnIcon />
+                    <Typography variant="body2" sx={{ ml: 1 }}>
+                        {district || 'Select Location'}
+                    </Typography>
+                </IconButton>
+                <IconButton
+                    color="inherit"
+                    onClick={handleUserMenuClick}
+                >
+                    <AccountCircleIcon />
+                    <Typography variant="body2" sx={{ ml: 1 }}>
+                        {userName}
+                    </Typography>
+                </IconButton>
+                <Menu
+                    anchorEl={anchorElUser}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleUserMenuClose}
+                >
+                    <MenuItem disabled>{userName}</MenuItem>
+                    <Divider />
+                    <MenuItem
+                        onClick={() => {
+                            localStorage.removeItem('isLoggedIn');
+                            localStorage.removeItem('userName');
+                            localStorage.removeItem('userLocation');
+                            if (typeof window.onLogout === 'function') window.onLogout();
+                            navigate('/');
+                            setTimeout(() => window.location.reload(), 0);
+                        }}
+                    >
+                        Logout
+                    </MenuItem>
+                </Menu>
+                </Toolbar>
+            </AppBar>
                 <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
                     <Box sx={{ width: 220 }} role="presentation" onClick={() => setDrawerOpen(false)}>
                         <List>
@@ -90,7 +121,7 @@ const HeaderAfterLogin = ({ userName, userLocation: initialDistrict, burgerMenu 
                         <Divider />
                     </Box>
                 </Drawer>
-                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleLocationClose}>
+                <Menu anchorEl={anchorElLocation} open={Boolean(anchorElLocation)} onClose={handleLocationClose}>
                     {districts.map((d, index) => (
                         <MenuItem key={index} onClick={() => handleDistrictSelect(d)}>
                             {`${index + 1}. ${d}`}
@@ -101,40 +132,46 @@ const HeaderAfterLogin = ({ userName, userLocation: initialDistrict, burgerMenu 
         );
     }
 
-    return (
-        <>
-            <AppBar position="static" sx={{ backgroundColor: '#f5f5f5', color: '#000', boxShadow: 'none', borderBottom: '1px solid #ddd' }}>
-                <Toolbar>
-                    <Box component="img" src={logo} alt="Logo" sx={{ width: 50, height: 50, mr: 2 }} />
-                    <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', textAlign: 'left' }}>
-                    </Typography>
-                    <IconButton color="inherit" onClick={handleLocationClick}>
-                        <LocationOnIcon />
-                        <Typography variant="body2" sx={{ ml: 1 }}>
-                            {/* {userLocation || 'Select Location'} */}
-                        </Typography>
-                    </IconButton>
-                    <IconButton color="inherit">
-                        <AccountCircleIcon />
-                    </IconButton>
-                </Toolbar>
-                <Toolbar sx={{ minHeight: 40, justifyContent: 'space-around' }}>
-                    {['HOME', 'GUJARAT', 'SPORTS', 'IPL 2025', 'INDIA', 'PAHALGAM ATTACK', 'WORLD', 'LIFESTYLE', 'KNOWLEDGE', 'BHAKTI', 'SUPPLEMENT', 'E-PAPER'].map((menuItem, index) => (
-                        <Button key={index} color="inherit">
-                            {menuItem}
-                        </Button>
-                    ))}
-                </Toolbar>
-            </AppBar>
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleLocationClose}>
-                {districts.map((d, index) => (
-                    <MenuItem key={index} onClick={() => handleDistrictSelect(d)}>
-                        {`${index + 1}. ${d}`}
-                    </MenuItem>
-                ))}
-            </Menu>
-        </>
-    );
+    // return (
+    //     <>
+    //         <AppBar position="static" sx={{ backgroundColor: '#f5f5f5', color: '#000', boxShadow: 'none', borderBottom: '1px solid #ddd' }}>
+    //             <Toolbar>
+    //                 <Box component="img" src={logo} alt="Logo" sx={{ width: 50, height: 50, mr: 2 }} />
+    //                 <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', textAlign: 'left' }}>
+    //                 </Typography>
+    //                 <IconButton color="inherit" onClick={handleLocationClick}>
+    //                     <LocationOnIcon />
+    //                     <Typography variant="body2" sx={{ ml: 1 }}>
+    //                         {/* {userLocation || 'Select Location'} */}
+    //                     </Typography>
+    //                 </IconButton>
+    //                 <IconButton color="inherit" onClick={() => {
+    //                     localStorage.removeItem('isLoggedIn');
+    //                     localStorage.removeItem('userName');
+    //                     localStorage.removeItem('userLocation');
+    //                     if (typeof window.onLogout === 'function') window.onLogout();
+    //                     navigate('/');
+    //                 }}>
+    //                     <AccountCircleIcon />
+    //                 </IconButton>
+    //             </Toolbar>
+    //             <Toolbar sx={{ minHeight: 40, justifyContent: 'space-around' }}>
+    //                 {['HOME', 'GUJARAT', 'SPORTS', 'IPL 2025', 'INDIA', 'PAHALGAM ATTACK', 'WORLD', 'LIFESTYLE', 'KNOWLEDGE', 'BHAKTI', 'SUPPLEMENT', 'E-PAPER'].map((menuItem, index) => (
+    //                     <Button key={index} color="inherit">
+    //                         {menuItem}
+    //                     </Button>
+    //                 ))}
+    //             </Toolbar>
+    //         </AppBar>
+    //         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleLocationClose}>
+    //             {districts.map((d, index) => (
+    //                 <MenuItem key={index} onClick={() => handleDistrictSelect(d)}>
+    //                     {`${index + 1}. ${d}`}
+    //                 </MenuItem>
+    //             ))}
+    //         </Menu>
+    //     </>
+    // );
 };
 
 export default HeaderAfterLogin;
