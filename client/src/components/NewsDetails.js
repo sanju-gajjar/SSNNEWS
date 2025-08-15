@@ -13,12 +13,18 @@ import {
     Avatar,
     Paper,
     Divider,
-    Stack
+    Stack,
+    useMediaQuery
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/Comment';
+import ShareIcon from '@mui/icons-material/Share';
 import Loader from './Loader';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -32,9 +38,9 @@ const CommentInput = styled(TextField)(({ theme }) => ({
 const CommentsContainer = styled(Paper)(({ theme }) => ({
     marginTop: theme.spacing(3),
     padding: theme.spacing(2),
-    background: '#fafafa',
-    borderRadius: 12,
-    boxShadow: theme.shadows[1],
+    background: '#f8f9fa',
+    borderRadius: 16,
+    boxShadow: theme.shadows[2],
     maxHeight: '50vh',
     overflowY: 'auto',
 }));
@@ -44,9 +50,24 @@ const CommentCard = styled(Box)(({ theme }) => ({
     alignItems: 'flex-start',
     gap: theme.spacing(2),
     padding: theme.spacing(1, 0),
+    borderBottom: '1px solid #eee',
+}));
+
+const StickyActions = styled(Box)(({ theme }) => ({
+    position: 'sticky',
+    bottom: 0,
+    background: '#fff',
+    zIndex: 10,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(1),
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
 }));
 
 const NewsDetails = ({ userName, userLocation }) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const { id } = useParams();
     const [news, setNews] = useState(null);
     const [comments, setComments] = useState([]);
@@ -54,6 +75,11 @@ const NewsDetails = ({ userName, userLocation }) => {
     const [likes, setLikes] = useState(0);
     const [loading, setLoading] = useState(false);
     const [visibleComments, setVisibleComments] = useState(10);
+    const [liked, setLiked] = useState(false);
+    const [showAuthDialog, setShowAuthDialog] = useState(false);
+
+    // Helper to check if user is logged in
+    const isLoggedIn = !!userName;
 
     useEffect(() => {
         let isMounted = true;
@@ -63,6 +89,7 @@ const NewsDetails = ({ userName, userLocation }) => {
                 if (isMounted) {
                     setNews(response.data);
                     setLikes(response.data.likes);
+                    setLiked(false); // Default: not liked
                 }
             })
             .catch(error => {
@@ -83,7 +110,16 @@ const NewsDetails = ({ userName, userLocation }) => {
             .catch(error => console.error(error));
     }, [id]);
 
+    const handleRequireAuth = (action) => {
+        if (!isLoggedIn) {
+            setShowAuthDialog(true);
+            return false;
+        }
+        return true;
+    };
+
     const handleAddComment = () => {
+        if (!handleRequireAuth('comment')) return;
         if (newComment.trim()) {
             axios.post(`${API_URL}/news/comments/add`, { id, user: userName || 'Anonymous', comment: newComment })
                 .then(response => {
@@ -95,16 +131,47 @@ const NewsDetails = ({ userName, userLocation }) => {
     };
 
     const handleLike = () => {
-        axios.post(`${API_URL}/news/like`, { id })
-            .then(() => setLikes(likes + 1))
-            .catch(error => console.error(error));
+        if (!handleRequireAuth('like')) return;
+        if (!liked) {
+            axios.post(`${API_URL}/news/like`, { id })
+                .then(() => {
+                    setLikes(likes + 1);
+                    setLiked(true);
+                })
+                .catch(error => console.error(error));
+        } else {
+            axios.post(`${API_URL}/news/unlike`, { id })
+                .then(() => {
+                    setLikes(likes - 1);
+                    setLiked(false);
+                })
+                .catch(error => console.error(error));
+        }
+    };
+
+    const handleShare = () => {
+        const url = window.location.href;
+        const shareData = {
+            title: news?.title || 'SSN News',
+            text: news?.title || '',
+            url,
+        };
+        if (navigator.share) {
+            navigator.share(shareData)
+                .catch((error) => console.error('Share failed:', error));
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(url)
+                .then(() => alert('Link copied to clipboard!'))
+                .catch(() => alert('Failed to copy link.'));
+        }
     };
 
     const handleLoadMoreComments = () => {
         setVisibleComments((prev) => prev + 10);
     };
 
-    if (!news) return <Typography variant="h6" align="center">Loading...</Typography>;
+    if (!news) return <Loader />;
 
     return (
         <Box sx={{
@@ -112,102 +179,143 @@ const NewsDetails = ({ userName, userLocation }) => {
             maxWidth: 600,
             margin: '0 auto',
             background: '#f9f9f9',
-            borderRadius: { xs: 0, sm: 3 }
+            borderRadius: { xs: 0, sm: 3 },
+            minHeight: '100vh'
         }}>
-            {loading ? <Loader /> : (
-                <>
-                    <Card sx={{ mb: 2, borderRadius: 3, boxShadow: 2 }}>
-                        <CardContent>
-                            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>{news.title}</Typography>
-                            {news.image && (
-                                <Box sx={{ textAlign: 'center', mb: 2 }}>
-                                    <img src={news.image} alt={news.title} style={{ maxWidth: '100%', borderRadius: 12 }} />
-                                </Box>
-                            )}
-                            <Typography variant="body1" sx={{ mb: 2 }}>{news.content}</Typography>
-                            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
-                                <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>{news.author?.[0] || 'A'}</Avatar>
-                                <Typography variant="subtitle1" color="text.secondary">{news.author}</Typography>
-                                <Divider orientation="vertical" flexItem />
-                                <Typography variant="subtitle2" color="text.secondary">Likes: {likes}</Typography>
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    size="small"
-                                    startIcon={<FavoriteIcon />}
-                                    onClick={handleLike}
-                                    sx={{ ml: 2 }}
-                                >
-                                    Like
-                                </Button>
-                            </Stack>
-                        </CardContent>
-                    </Card>
-
-                    {/* Comments Section */}
-                    <CommentsContainer>
-                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                            Comments ({comments.length})
-                        </Typography>
+            <Card sx={{
+                mb: 2,
+                borderRadius: 4,
+                boxShadow: 3,
+                overflow: 'hidden',
+                position: 'relative'
+            }}>
+                <CardContent>
+                    <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, fontSize: isMobile ? '1.3rem' : '2rem' }}>{news.title}</Typography>
+                    {news.image && (
+                        <Box sx={{ textAlign: 'center', mb: 2 }}>
+                            <img src={news.image} alt={news.title} style={{ maxWidth: '100%', borderRadius: 16, boxShadow: theme.shadows[2] }} />
+                        </Box>
+                    )}
+                    {news.video && (
+                        <Box sx={{ textAlign: 'center', mb: 2 }}>
+                            <iframe
+                                width="100%"
+                                height={isMobile ? 200 : 350}
+                                src={`https://www.youtube.com/embed/${(() => {
+                                    const url = news.video;
+                                    const match = url.match(/(?:v=|\/embed\/|\/live\/|\/shorts\/|\/watch\?v=)([A-Za-z0-9_-]{11})/);
+                                    if (match && match[1]) return match[1];
+                                    const parts = url.split('/');
+                                    const last = parts[parts.length - 1];
+                                    return last.length === 11 ? last : url;
+                                })()}?autoplay=1`}
+                                title="YouTube video"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                style={{ borderRadius: 16, boxShadow: theme.shadows[2] }}
+                            />
+                            {/* Removed the Share Video button as per autoplay request */}
+                        </Box>
+                    )}
+                    <Typography variant="body1" sx={{ mb: 2, fontSize: isMobile ? '1rem' : '1.1rem', color: '#333' }}>{news.content}</Typography>
+                    <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
+                        <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>{news.author?.[0] || 'A'}</Avatar>
+                        <Typography variant="subtitle1" color="text.secondary">{news.author}</Typography>
+                        <Divider orientation="vertical" flexItem />
+                        <Typography variant="subtitle2" color="text.secondary">Likes: {likes}</Typography>
+                    </Stack>
+                </CardContent>
+                <CardActions>
+                    <Button
+                        startIcon={<FavoriteIcon />}
+                        color={liked ? 'error' : 'primary'}
+                        variant="contained"
+                        onClick={handleLike}
+                        sx={{ borderRadius: 2, fontWeight: 600 }}
+                    >
+                        {liked ? 'Liked' : 'Like'}
+                    </Button>
+                    <Button
+                        startIcon={<ShareIcon />}
+                        color="primary"
+                        variant="outlined"
+                        onClick={handleShare}
+                        sx={{ borderRadius: 2, fontWeight: 600 }}
+                    >
+                        Share
+                    </Button>
+                </CardActions>
+            </Card>
+            <CommentsContainer elevation={0}>
+                <Typography variant="h6" sx={{ mb: 2 }}>Comments</Typography>
+                {isLoggedIn && (
+                    <Box sx={{ mb: 2 }}>
                         <CommentInput
-                            label="Write a comment..."
+                            label="Add a comment"
                             variant="outlined"
                             value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            InputProps={{
-                                endAdornment: (
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        startIcon={<CommentIcon />}
-                                        onClick={handleAddComment}
-                                        sx={{ borderRadius: 2 }}
-                                    >
-                                        Add
-                                    </Button>
-                                ),
-                            }}
+                            onChange={e => setNewComment(e.target.value)}
+                            multiline
+                            rows={2}
                         />
-                        <Divider sx={{ my: 2 }} />
+                        <Button
+                            startIcon={<CommentIcon />}
+                            variant="contained"
+                            color="primary"
+                            sx={{ mt: 1, borderRadius: 2, fontWeight: 600 }}
+                            onClick={handleAddComment}
+                        >
+                            Post
+                        </Button>
+                    </Box>
+                )}
+                {comments.slice(0, visibleComments).map((comment, idx) => (
+                    <CommentCard key={idx}>
+                        <Avatar sx={{ bgcolor: 'secondary.main', width: 28, height: 28 }}>
+                            {comment.user?.[0] || 'A'}
+                        </Avatar>
                         <Box>
-                            {comments.slice(0, visibleComments).map((comment) => (
-                                <CommentCard key={comment._id}>
-                                    <Avatar sx={{ bgcolor: 'secondary.main', width: 28, height: 28 }}>
-                                        {comment.user?.[0] || 'U'}
-                                    </Avatar>
-                                    <Box>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
-                                            {comment.user}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {comment.comment}
-                                        </Typography>
-                                    </Box>
-                                </CommentCard>
-                            ))}
-                            {comments.length === 0 && (
-                                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                                    No comments yet. Be the first to comment!
-                                </Typography>
-                            )}
+                            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>{comment.user}</Typography>
+                            <Typography variant="body2" sx={{ color: '#555' }}>{comment.comment}</Typography>
                         </Box>
-                        {visibleComments < comments.length && (
-                            <Button
-                                variant="text"
-                                color="primary"
-                                sx={{ mt: 2, mb: 1, fontWeight: 600 }}
-                                onClick={handleLoadMoreComments}
-                                fullWidth
-                            >
-                                Load More Comments
-                            </Button>
-                        )}
-                    </CommentsContainer>
-                </>
-            )}
+                    </CommentCard>
+                ))}
+                {comments.length > visibleComments && (
+                    <Button
+                        variant="text"
+                        color="primary"
+                        sx={{ mt: 2 }}
+                        onClick={handleLoadMoreComments}
+                    >
+                        Load more comments
+                    </Button>
+                )}
+            </CommentsContainer>
+            <Dialog open={showAuthDialog} onClose={() => setShowAuthDialog(false)}>
+                <DialogTitle>Authentication Required</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        You need to be logged in to perform this action.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        color="primary"
+                        onClick={() => {
+                            setShowAuthDialog(false);
+                            window.location.href = '/'; // Redirect to login
+                        }}
+                    >
+                        Login
+                    </Button>
+                    <Button onClick={() => setShowAuthDialog(false)} color="secondary">
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };
 
 export default NewsDetails;
-

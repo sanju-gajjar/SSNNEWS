@@ -39,9 +39,17 @@ app.use((req, res, next) => {
 
 // News Schema and Model
 const newsSchema = new mongoose.Schema({
-    title: String,
-    content: String,
-    author: String,
+    title: { type: String, required: true },
+    title2: { type: String },
+    content: { type: String, required: true },
+    author: { type: String, required: true },
+    approvedby: { type: String, required: true },
+    tags: [{ type: String }],
+    top: { type: Number, default: 0 },
+    video: { type: String },
+    image: { type: String },
+    source: { type: String },
+    views: { type: Number, default: 0 },
     likes: { type: Number, default: 0 },
     comments: [{ user: String, comment: String }],
     createdAt: { type: Date, default: Date.now }
@@ -103,13 +111,7 @@ const News = mongoose.model('News', newsSchema);
 // Admin: Add news
 app.post('/news', async (req, res) => {
     try {
-        const { title, title2, content, author, approvedby, tags, top, video, image, source } = req.body;
-
-        if (!title || !content || !author || !approvedby || !tags || !video || !image || !source) {
-            return res.status(400).send({ message: 'All fields are required.' });
-        }
-
-        const news = new News({
+        const {
             title,
             title2,
             content,
@@ -120,6 +122,30 @@ app.post('/news', async (req, res) => {
             video,
             image,
             source
+        } = req.body;
+
+        if (!title || !content || !author || !approvedby || !tags || !video || !image || !source) {
+            return res.status(400).send({ message: 'All fields are required.' });
+        }
+
+        const tagsArray = Array.isArray(tags)
+            ? tags
+            : typeof tags === 'string'
+                ? tags.split(',').map(tag => tag.trim()).filter(Boolean)
+                : [];
+
+        const news = new News({
+            title,
+            title2,
+            content,
+            author,
+            approvedby,
+            tags: tagsArray,
+            top: typeof top === 'string' ? Number(top) : top,
+            video,
+            image,
+            source,
+            createdAt: new Date()
         });
 
         await news.save();
@@ -182,7 +208,7 @@ app.delete('/news/:id', async (req, res) => {
     }
 });
 
-// User: Like a news
+// User: Like a news (toggle like/unlike)
 app.post('/news/like', async (req, res) => {
     try {
         const news = await News.findByIdAndUpdate(
@@ -191,10 +217,23 @@ app.post('/news/like', async (req, res) => {
             { new: true }
         );
         if (!news) return res.status(404).send('News not found');
-        console.log(`[INFO] News liked successfully: ${req.body.id}`);
         res.send(news);
     } catch (err) {
-        console.error(`[ERROR] Failed to like news:`, err);
+        res.status(400).send(err.message);
+    }
+});
+
+// User: Unlike a news (decrement likes)
+app.post('/news/unlike', async (req, res) => {
+    try {
+        const news = await News.findByIdAndUpdate(
+            req.body.id,
+            { $inc: { likes: -1 } },
+            { new: true }
+        );
+        if (!news) return res.status(404).send('News not found');
+        res.send(news);
+    } catch (err) {
         res.status(400).send(err.message);
     }
 });

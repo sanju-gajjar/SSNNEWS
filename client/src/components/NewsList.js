@@ -42,12 +42,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import  './NewsUI.css';
+import './NewsUI.css';
 import LiveNews from './LiveNews';
 import NewsHeading from './NewsHeading';
 import TechNews from './TechNews';
 import CrimeNews from './CrimeNews';
 import SportsNews from './SportsNews';
+import { Box, Grid, Card, CardContent, CardMedia, Typography } from '@mui/material';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -61,26 +62,57 @@ const NewsList = () => {
             .catch(error => console.error(error));
     }, []);
 
-   const handleReadMore = (id) => {
+    const handleReadMore = (id) => {
         navigate(`/news/${id}`);
     };
 
     return (
-        <>
-        <div className="news-list">
-            <div className='news-left-section'>
-            <LiveNews heading={'ઓપરેશન સિંદૂર વચ્ચે પીએમ મોદી રાત્રે 8 વાગ્યે રાષ્ટ્રને સંબોધિત કરશે'}/>
-           <TechNews newList={newsList} handleReadMore={handleReadMore}/>
-              <SportsNews newList={newsList} handleReadMore={handleReadMore}/>
-           </div>
-           <div className='news-right-section'>           
-                <CrimeNews newList={newsList} handleReadMore={handleReadMore}/>             
-            </div>
-
-             
-        </div>
-                
-        </>
+        <Box sx={{ width: '100%', px: { xs: 1, sm: 3 }, py: { xs: 1, sm: 2 } }}>
+            <LiveNews heading={'ઓપરેશન સિંદૂર વચ્ચે પીએમ મોદી રાત્રે 8 વાગ્યે રાષ્ટ્રને સંબોધિત કરશે'} />
+            <Grid container spacing={2} sx={{ mt: 2 }}>
+                <Grid item xs={12} md={8}>
+                    <NewsHeading heading={'Technology'} />
+                    <Grid container spacing={2}>
+                        {newsList.slice(0, 6).map((news) => (
+                            <Grid item xs={12} sm={6} key={news._id}>
+                                <Card
+                                    sx={{
+                                        borderRadius: 3,
+                                        boxShadow: 2,
+                                        cursor: 'pointer',
+                                        transition: 'transform 0.2s',
+                                        '&:hover': { transform: 'scale(1.03)' }
+                                    }}
+                                    onClick={() => handleReadMore(news._id)}
+                                >
+                                    <CardMedia
+                                        component="img"
+                                        height="140"
+                                        image={news.image}
+                                        alt={news.title}
+                                        sx={{ borderRadius: '12px 12px 0 0' }}
+                                    />
+                                    <CardContent>
+                                        <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                                            {news.title}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                            {news &&  news.content && news.content.substring(0, 80)}...
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                    <NewsHeading heading={'Sports'} />
+                    <SportsNews newList={newsList} handleReadMore={handleReadMore} />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                    <NewsHeading heading={'Crime'} />
+                    <CrimeNews newList={newsList} handleReadMore={handleReadMore} />
+                </Grid>
+            </Grid>
+        </Box>
     );
 };
 

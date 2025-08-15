@@ -20,7 +20,11 @@ function AdminTopPanel() {
     top: 0,
     video: '',
     image: '',
-    source: ''
+    source: '',
+    views: 0,
+    likes: 0,
+    comments: [],
+    createdAt: new Date().toISOString()
   });
 
   const handleOpen = () => setOpen(true);
@@ -32,14 +36,33 @@ function AdminTopPanel() {
   };
 
   const handleSubmit = async () => {
-    const { title, content, author, approvedby, tags, video, image, source } = formData;
+    const {
+      title, title2, content, author, approvedby, tags, top, video, image, source,
+      views, likes, comments, createdAt
+    } = formData;
     if (!title || !content || !author || !approvedby || !tags || !video || !image || !source) {
       alert('Please fill all required fields.');
       return;
     }
 
     try {
-      const response = await axios.post(`${API_URL}/news`, { ...formData, tags: tags.split(',') });
+      const payload = {
+        title,
+        title2,
+        content,
+        author,
+        approvedby,
+        tags: Array.isArray(tags) ? tags : tags.split(',').map(tag => tag.trim()).filter(Boolean),
+        top: typeof top === 'string' ? Number(top) : top,
+        video,
+        image,
+        source,
+        views: typeof views === 'string' ? Number(views) : views,
+        likes: typeof likes === 'string' ? Number(likes) : likes,
+        comments: Array.isArray(comments) ? comments : [],
+        createdAt: createdAt ? new Date(createdAt) : new Date()
+      };
+      const response = await axios.post(`${API_URL}/news`, payload);
       alert('News added successfully!');
       handleClose();
     } catch (error) {
@@ -93,20 +116,36 @@ function AdminTopPanel() {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Upload Top News</DialogTitle>
         <DialogContent>
-          <TextField name="title" label="Title" fullWidth margin="dense" onChange={handleChange} />
-          <TextField name="title2" label="Title 2" fullWidth margin="dense" onChange={handleChange} />
-          <TextField name="content" label="Content" fullWidth margin="dense" multiline rows={4} onChange={handleChange} />
-          <TextField name="author" label="Author" fullWidth margin="dense" onChange={handleChange} />
-          <TextField name="approvedby" label="Approved By" fullWidth margin="dense" onChange={handleChange} />
-          <TextField name="tags" label="Tags (comma-separated)" fullWidth margin="dense" onChange={handleChange} />
-          <TextField name="top" label="Top (1 or 0)" type="number" fullWidth margin="dense" onChange={handleChange} />
-          <TextField name="video" label="Video URL" fullWidth margin="dense" onChange={handleChange} />
-          <TextField name="image" label="Image URL" fullWidth margin="dense" onChange={handleChange} />
-          <TextField name="source" label="Source URL" fullWidth margin="dense" onChange={handleChange} />
+          <form id="newsForm">
+            <TextField name="title" label="Title" fullWidth margin="dense" defaultValue={formData.title} />
+            <TextField name="title2" label="Title 2" fullWidth margin="dense" defaultValue={formData.title2} />
+            <TextField name="content" label="Content" fullWidth margin="dense" multiline rows={4} defaultValue={formData.content} />
+            <TextField name="author" label="Author" fullWidth margin="dense" defaultValue={formData.author} />
+            <TextField name="approvedby" label="Approved By" fullWidth margin="dense" defaultValue={formData.approvedby} />
+            <TextField name="tags" label="Tags (comma-separated)" fullWidth margin="dense" defaultValue={formData.tags} />
+            <TextField name="top" label="Top (1 or 0)" type="number" fullWidth margin="dense" defaultValue={formData.top} />
+            <TextField name="video" label="Video URL" fullWidth margin="dense" defaultValue={formData.video} />
+            <TextField name="image" label="Image URL" fullWidth margin="dense" defaultValue={formData.image} />
+            <TextField name="source" label="Source URL" fullWidth margin="dense" defaultValue={formData.source} />
+          </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">Cancel</Button>
-          <Button onClick={handleSubmit} color="primary">Submit</Button>
+          <Button
+            onClick={() => {
+              const form = document.getElementById('newsForm');
+              const data = {};
+              Array.from(form.elements).forEach(el => {
+                if (el.name) data[el.name] = el.value;
+              });
+              setFormData(data);
+              // Call handleSubmit with updated formData
+              setTimeout(handleSubmit, 0);
+            }}
+            color="primary"
+          >
+            Submit
+          </Button>
         </DialogActions>
       </Dialog>
     </section>
