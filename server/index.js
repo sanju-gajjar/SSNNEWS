@@ -378,7 +378,7 @@ app.post('/external-news/fetch-and-store', async (req, res) => {
         const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
         // Check if today's external news already exists
-        const existingNews = await ExternalNews.find({
+        let existingNews = await ExternalNews.find({
             createdAt: { $gte: startOfDay, $lte: endOfDay }
         });
         if (existingNews && existingNews.length > 0) {
