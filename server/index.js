@@ -382,6 +382,9 @@ app.post('/external-news/fetch-and-store', async (req, res) => {
             createdAt: { $gte: startOfDay, $lte: endOfDay }
         });
         if (existingNews && existingNews.length > 0) {
+        existingNews = await ExternalNews.find({
+            createdAt: { $gte: startOfDay }
+        }).limit(50)
             return res.send({ count: existingNews.length, message: 'External news already fetched for today', news: existingNews });
         }
 

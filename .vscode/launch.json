@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Server",
+      "program": "${workspaceFolder}/server/index.js",
+      "env": {
+        "JWT_SECRET": "your_jwt_secret_here",
+        "MONGODB_URL": "mongodb+srv://swadeshsandesh:2t9Z4PmygBU41RYV@clusterssn.rasxlii.mongodb.net/?retryWrites=true&w=majority&appName=ClusterSSN",
+        "NEWS_API_KEY": "pub_e7763ec634c64355856adb1a5dab597f"
+      },
+      "cwd": "${workspaceFolder}/server",
+      "console": "integratedTerminal"
+    }
+  ]
+}
