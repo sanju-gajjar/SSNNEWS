@@ -221,6 +221,7 @@ app.get('/news/:id', async (req, res) => {
         res.status(400).send(err.message);
     }
 });
+// User: Get news details by ID (GET)
 
 // Admin: Update news by ID (POST)
 app.post('/news/:id/update', async (req, res) => {

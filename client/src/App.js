@@ -69,6 +69,7 @@ const App = () => {
           <Routes>
             <Route path="/UserHome" element={<PrivateRoute><NewsList /></PrivateRoute>} />
             <Route path="/news/:id" element={<NewsDetails userName={userName} userLocation={userLocation} />} />
+            <Route path="/news/:id/share" element={<NewsDetails userName={userName} userLocation={userLocation} />} />
             <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
             <Route path="/" element={<Login setIsLoggedIn={setIsLoggedIn} setUserName={setUserName} setUserLocation={setUserLocation} />} />
             <Route path="/register" element={<Registration />} />

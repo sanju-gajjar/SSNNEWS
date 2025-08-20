@@ -158,7 +158,14 @@ const NewsDetails = ({ userName, userLocation }) => {
     };
 
     const handleShare = () => {
-        const url = window.location.href;
+        let url = window.location.href;
+        if (!url.endsWith('/share')) {
+            if (url.includes('/share')) {
+                // Already contains /share somewhere, do not append
+            } else {
+                url += '/share';
+            }
+        }
         const shareData = {
             title: news?.title || 'SSN News',
             text: news?.title || '',
@@ -187,7 +194,13 @@ const NewsDetails = ({ userName, userLocation }) => {
     const nextId = currentIndex < allNewsIds.length - 1 ? allNewsIds[currentIndex + 1] : null;
     const handleGoBack = () => window.history.back();
     const handleGoHome = () => window.location.href = '/UserHome';
-    const handleGoToNews = (nid) => window.location.href = `/news/${nid._id}`;
+    const handleGoToNews = (nid) => {
+        let url = `/news/${nid._id}`;
+        if (!url.endsWith('/share')) {
+            url += '/share';
+        }
+        window.location.href = url;
+    };
 
     return (
         <Box sx={{
