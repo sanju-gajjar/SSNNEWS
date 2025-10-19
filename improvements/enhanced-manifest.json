@@ -1,0 +1,60 @@
+{
+  "short_name": "સ્વદેશ સંદેશ સમાચાર",
+  "name": "SSN News - Gujarat Local News",
+  "description": "Your trusted source for Gujarat local news, sports, technology, and crime updates",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/UserHome",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#ed6c02",
+  "background_color": "#ffffff",
+  "categories": ["news", "social"],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshot-desktop.png", 
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Latest News",
+      "short_name": "Latest",
+      "description": "View latest news updates",
+      "url": "/UserHome",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sports News",
+      "short_name": "Sports",
+      "description": "Sports news and updates",
+      "url": "/UserHome?category=sports",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    }
+  ]
+}

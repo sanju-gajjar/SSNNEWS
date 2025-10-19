@@ -4,7 +4,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import axios from 'axios';
-import logo from '../images/newLogo-transperant.png';
 import { useNavigate } from 'react-router-dom';
 const API_URL = process.env.REACT_APP_API_URL;
 const HeaderAfterLogin = ({ userName, userLocation: initialDistrict, burgerMenu }) => {
@@ -70,7 +69,17 @@ const HeaderAfterLogin = ({ userName, userLocation: initialDistrict, burgerMenu 
                         <IconButton edge="start" color="inherit" onClick={() => setDrawerOpen(true)}>
                             <MenuIcon />
                         </IconButton>
-                <Box component="img" src={logo} alt="Logo" sx={{ width: 50, height: 50, mx: 2 }} />
+                <Box 
+                    component="img" 
+                    src="/logo152.png" 
+                    alt="Logo" 
+                    sx={{ 
+                        width: { xs: 80, sm: 100 }, 
+                        height: { xs: 80, sm: 100 }, 
+                        mx: 2,
+                        objectFit: 'contain'
+                    }} 
+                />
                         <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', textAlign: 'left' }} />
                 <IconButton color="inherit" onClick={handleLocationClick}>
                     <LocationOnIcon />

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios'; // Import axios for API calls
 import bg from '../images/bg1.jpg';
 import Button from '@mui/material/Button';
-import logo from '../images/log1.png';
 import TextField from '@mui/material/TextField';
 import { styled } from "@mui/material/styles";
 import ButtonBox from './UI/ButtonBox';
@@ -35,7 +34,7 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const Login = ({ setIsLoggedIn, setUserName,setUserLocation }) => {
+const Login = ({ setIsLoggedIn, setUserName, setUserLocation, setUserRole }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -51,10 +50,16 @@ const Login = ({ setIsLoggedIn, setUserName,setUserLocation }) => {
           localStorage.setItem('isLoggedIn', 'true');
           localStorage.setItem('userName', response.data.userName);
           localStorage.setItem('userLocation', response.data.userLocation);
+          localStorage.setItem('userRole', response.data.userRole || 'user');
+          localStorage.setItem('token', response.data.token); // Store JWT token
+          
           setIsLoggedIn(true);
           setUserName(response.data.userName);
           setUserLocation(response.data.userLocation);
-          navigate('/UserHome');
+          if (setUserRole) {
+            setUserRole(response.data.userRole || 'user');
+          }
+          navigate('/');
         }
     } catch (error) {
         setMessage(error.response?.data?.message || 'Login failed');
@@ -63,7 +68,7 @@ const Login = ({ setIsLoggedIn, setUserName,setUserLocation }) => {
 
   return (
     <div className='loginWrap'>
-      <img src={logo} alt='logo' className='logo' />
+      <img src='/logo152.png' alt='logo' className='logo' />
       <Para variant='h2' color='secondary' text='Welcome' sx={{ my: 2 }} />
       <form onSubmit={handleSubmit} className='formLogin'>
         <div>

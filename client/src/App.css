@@ -90,7 +90,18 @@ a{text-decoration: none !important;}
 
 
 .logo{
-  width:170px
+  width: 100px;
+  max-width: 100px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Mobile responsive logo */
+@media (max-width: 768px) {
+  .logo {
+    width: 80px;
+    max-width: 80px;
+  }
 }
 
 .formLogin{

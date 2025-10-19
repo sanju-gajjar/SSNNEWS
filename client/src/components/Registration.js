@@ -3,7 +3,6 @@ import axios from 'axios'; // Import axios for API calls
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 // Removed unused import for 'bg'
 // Removed unused import for 'Button'
-import logo from '../images/log1.png';
 import TextField from '@mui/material/TextField';
 import { styled } from "@mui/material/styles";
 import ButtonBox from './UI/ButtonBox';
@@ -64,7 +63,7 @@ const Registration = () => {
         <div className='loginWrap'>
             {loading ? <Loader /> : (
                 <>
-                    <img src={logo} alt='logo' className='logo' />
+                    <img src='/logo152.png' alt='logo' className='logo' />
                     <Para variant='h2' color='secondary' text='Register' sx={{ my: 2 }} />
                     <form onSubmit={handleSubmit} className='formLogin'>
                         <div>

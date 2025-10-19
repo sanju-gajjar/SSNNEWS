@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardMedia, Link, Paper } from '@mui/material';
-import logo from '../../images/log1.png';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import './AdminLeftPanel.css';
 import Para from '../UI/Para';
@@ -27,7 +26,16 @@ function AdminLeftPanel() {
     <>
         <Paper elevation={4} className='adminWrap'>
             <section className='logoAdmin'>
-                      <img src={logo} alt='logo' className='' />
+                      <img 
+                        src='/logo152.png' 
+                        alt='logo' 
+                        style={{
+                          width: '100%',
+                          maxWidth: '100px',
+                          height: 'auto',
+                          objectFit: 'contain'
+                        }}
+                      />
             </section>
             <ul className='menuWrap'>
             {

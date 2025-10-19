@@ -1,0 +1,38 @@
+{
+  "name": "ssnnews-root",
+  "version": "1.0.0",
+  "description": "SSN News - Mobile-friendly news web application",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "start": "concurrently \"npm run server:start\" \"npm run client:start\"",
+    "build": "npm run client:build",
+    "install:all": "npm install && npm run install:server && npm run install:client",
+    "install:server": "cd server && npm install",
+    "install:client": "cd client && npm install",
+    "server:dev": "cd server && nodemon index.js",
+    "server:start": "cd server && npm start",
+    "client:dev": "cd client && npm start",
+    "client:start": "cd client && npm run serve",
+    "client:build": "cd client && npm run build",
+    "setup": "npm run install:all"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "news",
+    "mobile-app",
+    "react",
+    "nodejs",
+    "mongodb",
+    "gujarat-news",
+    "local-news"
+  ],
+  "author": "SSN News Team",
+  "license": "MIT"
+}

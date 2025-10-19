@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
     Box,
@@ -8,41 +8,182 @@ import {
     TextField,
     Card,
     CardContent,
-    CardActions,
-    Grid,
     Avatar,
     Paper,
     Divider,
     Stack,
-    useMediaQuery
+    useMediaQuery,
+    Chip,
+    IconButton,
+    Fab,
+    Container,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import CommentIcon from '@mui/icons-material/Comment';
-import ShareIcon from '@mui/icons-material/Share';
+import { styled, useTheme, keyframes } from '@mui/material/styles';
+import {
+    Favorite as FavoriteIcon,
+    FavoriteBorder as FavoriteBorderIcon,
+    Comment as CommentIcon,
+    Share as ShareIcon,
+    AccessTime as TimeIcon,
+    LocationOn as LocationIcon,
+    Visibility as ViewIcon,
+    BookmarkBorder as BookmarkIcon,
+    ArrowBack as ArrowBackIcon
+} from '@mui/icons-material';
+import { formatDistanceToNow } from 'date-fns';
 import Loader from './Loader';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
+import ModernBottomNav from './BottomNavigation/ModernBottomNav';
+import RelatedNews from './RelatedNews/RelatedNews';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-const CommentInput = styled(TextField)(({ theme }) => ({
-    marginTop: theme.spacing(2),
+// Animations
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const slideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+// Styled Components
+const HeroSection = styled(Box)(({ theme }) => ({
+    position: 'relative',
+    borderRadius: 24,
+    overflow: 'hidden',
+    marginBottom: theme.spacing(3),
+    boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+    animation: `${fadeInUp} 0.8s ease-out`,
+    [theme.breakpoints.down('sm')]: {
+        borderRadius: 16,
+        marginBottom: theme.spacing(2),
+    }
+}));
+
+const HeroImage = styled('img')(({ theme }) => ({
     width: '100%',
-    background: '#fff',
-    borderRadius: 8,
+    height: 'auto',
+    maxHeight: 400,
+    objectFit: 'cover',
+    display: 'block',
+    [theme.breakpoints.down('sm')]: {
+        maxHeight: 250,
+    }
+}));
+
+const HeroOverlay = styled(Box)({
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+    padding: '40px 24px 24px',
+    color: 'white',
+});
+
+const ContentCard = styled(Card)(({ theme }) => ({
+    borderRadius: 20,
+    boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+    marginBottom: theme.spacing(3),
+    background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+    animation: `${fadeInUp} 0.8s ease-out 0.2s both`,
+    [theme.breakpoints.down('sm')]: {
+        borderRadius: 16,
+        marginBottom: theme.spacing(2),
+    }
+}));
+
+const ActionButton = styled(IconButton)(({ theme }) => ({
+    background: 'linear-gradient(45deg, #667eea, #764ba2)',
+    color: 'white',
+    width: 48,
+    height: 48,
+    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.4)',
+    '&:hover': {
+        background: 'linear-gradient(45deg, #764ba2, #667eea)',
+        transform: 'translateY(-2px)',
+        boxShadow: '0 12px 35px rgba(102, 126, 234, 0.6)',
+    },
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    [theme.breakpoints.down('sm')]: {
+        width: 44,
+        height: 44,
+    }
+}));
+
+const LikeButton = styled(IconButton)(({ theme, liked }) => ({
+    background: liked 
+        ? 'linear-gradient(45deg, #FF6B6B, #FF8E53)'
+        : 'linear-gradient(45deg, #667eea, #764ba2)',
+    color: 'white',
+    width: 48,
+    height: 48,
+    boxShadow: liked 
+        ? '0 8px 25px rgba(255, 107, 107, 0.4)'
+        : '0 8px 25px rgba(102, 126, 234, 0.4)',
+    '&:hover': {
+        background: liked
+            ? 'linear-gradient(45deg, #FF8E53, #FF6B6B)'
+            : 'linear-gradient(45deg, #764ba2, #667eea)',
+        transform: 'translateY(-2px) scale(1.05)',
+        boxShadow: liked
+            ? '0 12px 35px rgba(255, 107, 107, 0.6)'
+            : '0 12px 35px rgba(102, 126, 234, 0.6)',
+    },
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    [theme.breakpoints.down('sm')]: {
+        width: 44,
+        height: 44,
+    }
+}));
+
+const MetaChip = styled(Chip)(({ theme }) => ({
+    background: 'rgba(255,255,255,0.9)',
+    backdropFilter: 'blur(10px)',
+    color: theme.palette.text.primary,
+    fontWeight: 600,
+    '& .MuiSvgIcon-root': {
+        color: theme.palette.primary.main,
+    }
+}));
+
+const CommentInput = styled(TextField)(({ theme }) => ({
+    '& .MuiOutlinedInput-root': {
+        borderRadius: 16,
+        background: 'rgba(255,255,255,0.9)',
+        backdropFilter: 'blur(10px)',
+    }
 }));
 
 const CommentsContainer = styled(Paper)(({ theme }) => ({
     marginTop: theme.spacing(3),
-    padding: theme.spacing(2),
-    background: '#f8f9fa',
-    borderRadius: 16,
-    boxShadow: theme.shadows[2],
-    maxHeight: '50vh',
-    overflowY: 'auto',
+    padding: theme.spacing(3),
+    background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+    borderRadius: 20,
+    boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+    animation: `${fadeInUp} 0.8s ease-out 0.4s both`,
+    [theme.breakpoints.down('sm')]: {
+        padding: theme.spacing(2),
+        borderRadius: 16,
+    }
 }));
 
 const CommentCard = styled(Box)(({ theme }) => ({
@@ -69,6 +210,8 @@ const NewsDetails = ({ userName, userLocation }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const { id } = useParams();
+    const navigate = useNavigate();
+    
     const [news, setNews] = useState(null);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
@@ -76,8 +219,9 @@ const NewsDetails = ({ userName, userLocation }) => {
     const [loading, setLoading] = useState(false);
     const [visibleComments, setVisibleComments] = useState(10);
     const [liked, setLiked] = useState(false);
-    const [showAuthDialog, setShowAuthDialog] = useState(false);
     const [allNewsIds, setAllNewsIds] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(-1);
+    const [showAuthDialog, setShowAuthDialog] = useState(false);
 
     // Use localStorage for auth state
     const isLoggedIn = !!localStorage.getItem('isLoggedIn');
@@ -186,215 +330,434 @@ const NewsDetails = ({ userName, userLocation }) => {
         setVisibleComments((prev) => prev + 10);
     };
 
-    if (!news) return <Loader />;
+    // Navigation logic - using the state variable
+    const newsIndex = allNewsIds.findIndex(nid => String(nid._id) === String(id));
+    React.useEffect(() => {
+        if (newsIndex !== -1) {
+            setCurrentIndex(newsIndex);
+        }
+    }, [newsIndex]);
 
-    // Navigation logic
-    const currentIndex = allNewsIds.findIndex(nid => String(nid._id) === String(id));
+    if (loading) return <Loader />;
+    if (!news) return <Loader />;
     const prevId = currentIndex > 0 ? allNewsIds[currentIndex - 1] : null;
     const nextId = currentIndex < allNewsIds.length - 1 ? allNewsIds[currentIndex + 1] : null;
-    const handleGoBack = () => window.history.back();
-    const handleGoHome = () => window.location.href = '/UserHome';
-    const handleGoToNews = (nid) => {
-        let url = `/news/${nid._id}`;
-        if (!url.endsWith('/share')) {
-            url += '/share';
+    // Navigation handlers
+    const handleGoHome = () => navigate('/UserHome');
+    const handleGoToNews = (nid) => navigate(`/news/${nid._id}`);
+    const handlePrevious = () => prevId && handleGoToNews(prevId);
+    const handleNext = () => nextId && handleGoToNews(nextId);
+
+    const formatDate = (dateString) => {
+        try {
+            return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+        } catch (error) {
+            return 'Recently';
         }
-        window.location.href = url;
+    };
+
+    const handleNewsClick = (newsId) => {
+        navigate(`/news/${newsId}`);
     };
 
     return (
         <Box sx={{
-            padding: { xs: 1, sm: 3 },
-            maxWidth: 600,
-            margin: '0 auto',
-            background: '#f9f9f9',
-            borderRadius: { xs: 0, sm: 3 },
-            minHeight: '100vh'
+            minHeight: '100vh',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            pb: 12 // Extra padding for bottom navigation
         }}>
-            {/* Navigation Bar */}
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                mb: 2,
-                px: 1,
-                py: 1,
-                background: '#fff',
-                borderRadius: 3,
-                boxShadow: theme.shadows[2],
-                position: 'sticky',
-                top: 0,
-                zIndex: 20
-            }}>
-                {/* <Button variant="outlined" color="primary" onClick={handleGoBack} sx={{ borderRadius: 2, fontWeight: 600 }}>
-                    Back
-                </Button> */}
-                <Stack direction="row" spacing={1}>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        disabled={!prevId}
-                        onClick={() => handleGoToNews(prevId)}
-                        sx={{ borderRadius: 2, fontWeight: 600 }}
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        disabled={!nextId}
-                        onClick={() => handleGoToNews(nextId)}
-                        sx={{ borderRadius: 2, fontWeight: 600 }}
-                    >
-                        Next
-                    </Button>
-                </Stack>
-                <Button variant="outlined" color="primary" onClick={handleGoHome} sx={{ borderRadius: 2, fontWeight: 600 }}>
-                    Home
-                </Button>
-            </Box>
-            {/* News Card */}
-            <Card sx={{
-                mb: 2,
-                borderRadius: 4,
-                boxShadow: 3,
-                overflow: 'hidden',
-                position: 'relative'
-            }}>
-                <CardContent>
-                    <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, fontSize: isMobile ? '1.3rem' : '2rem' }}>{news.title}</Typography>
-                    {news.image && (
-                        <Box sx={{ textAlign: 'center', mb: 2 }}>
-                            <img src={news.image} alt={news.title} style={{ maxWidth: '100%', borderRadius: 16, boxShadow: theme.shadows[2] }} />
-                        </Box>
-                    )}
-                    {news.video && (
-                        <Box sx={{ textAlign: 'center', mb: 2 }}>
-                            <iframe
-                                width="100%"
-                                height={isMobile ? 200 : 350}
-                                src={`https://www.youtube.com/embed/${(() => {
-                                    const url = news.video;
-                                    // Handle youtu.be short links and normal links
-                                    let videoId = '';
-                                    // youtu.be/<id>
-                                    const shortMatch = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
-                                    if (shortMatch && shortMatch[1]) videoId = shortMatch[1];
-                                    else {
-                                        // Normal YouTube links
-                                        const match = url.match(/(?:v=|\/embed\/|\/live\/|\/shorts\/|\/watch\?v=)([A-Za-z0-9_-]{11})/);
-                                        if (match && match[1]) videoId = match[1];
-                                        else {
-                                            // Try to get last part if it looks like an ID
-                                            const parts = url.split('/');
-                                            const last = parts[parts.length - 1].split('?')[0];
-                                            videoId = last.length === 11 ? last : url;
-                                        }
-                                    }
-                                    return videoId;
-                                })()}?autoplay=1`}
-                                title="YouTube video"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                style={{ borderRadius: 16, boxShadow: theme.shadows[2] }}
-                            />
-                            {/* Removed the Share Video button as per autoplay request */}
-                        </Box>
-                    )}
-                    <Typography variant="body1" sx={{ mb: 2, fontSize: isMobile ? '1rem' : '1.1rem', color: '#333' }}>{news.content}</Typography>
-                    <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
-                        <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>{news.author?.[0] || 'A'}</Avatar>
-                        <Typography variant="subtitle1" color="text.secondary">{news.author}</Typography>
-                        <Divider orientation="vertical" flexItem />
-                        <Typography variant="subtitle2" color="text.secondary">Likes: {likes}</Typography>
-                    </Stack>
-                </CardContent>
-                <CardActions>
-                    <Button
-                        startIcon={<FavoriteIcon />}
-                        color={liked ? 'error' : 'primary'}
-                        variant="contained"
-                        onClick={handleLike}
-                        sx={{ borderRadius: 2, fontWeight: 600 }}
-                    >
-                        {liked ? 'Liked' : 'Like'}
-                    </Button>
-                    <Button
-                        startIcon={<ShareIcon />}
-                        color="primary"
-                        variant="outlined"
-                        onClick={handleShare}
-                        sx={{ borderRadius: 2, fontWeight: 600 }}
-                    >
-                        Share
-                    </Button>
-                </CardActions>
-            </Card>
-            <CommentsContainer elevation={0}>
-                <Typography variant="h6" sx={{ mb: 2 }}>Comments</Typography>
-                {isLoggedIn && (
-                    <Box sx={{ mb: 2 }}>
-                        <CommentInput
-                            label="Add a comment"
-                            variant="outlined"
-                            value={newComment}
-                            onChange={e => setNewComment(e.target.value)}
-                            multiline
-                            rows={2}
-                        />
-                        <Button
-                            startIcon={<CommentIcon />}
-                            variant="contained"
-                            color="primary"
-                            sx={{ mt: 1, borderRadius: 2, fontWeight: 600 }}
-                            onClick={handleAddComment}
-                        >
-                            Post
-                        </Button>
-                    </Box>
-                )}
-                {comments.slice(0, visibleComments).map((comment, idx) => (
-                    <CommentCard key={idx}>
-                        <Avatar sx={{ bgcolor: 'secondary.main', width: 28, height: 28 }}>
-                            {comment.user?.[0] || 'A'}
-                        </Avatar>
-                        <Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>{comment.user}</Typography>
-                            <Typography variant="body2" sx={{ color: '#555' }}>{comment.comment}</Typography>
-                        </Box>
-                    </CommentCard>
-                ))}
-                {comments.length > visibleComments && (
-                    <Button
-                        variant="text"
-                        color="primary"
-                        sx={{ mt: 2 }}
-                        onClick={handleLoadMoreComments}
-                    >
-                        Load more comments
-                    </Button>
-                )}
-            </CommentsContainer>
-            <Dialog open={showAuthDialog} onClose={() => setShowAuthDialog(false)}>
-                <DialogTitle>Authentication Required</DialogTitle>
-                <DialogContent>
-                    <Typography>
-                        You need to be logged in to perform this action.
-                    </Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        color="primary"
-                        onClick={() => {
-                            setShowAuthDialog(false);
-                            window.location.href = '/'; // Redirect to login
+            <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2 } }}>
+                {/* Header with back button */}
+                <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    pt: 2, 
+                    pb: 1,
+                    animation: `${slideIn} 0.5s ease-out`
+                }}>
+                    <Fab
+                        size="small"
+                        onClick={() => navigate(-1)}
+                        sx={{ 
+                            background: 'rgba(255,255,255,0.9)',
+                            backdropFilter: 'blur(10px)',
+                            color: theme.palette.primary.main,
+                            mr: 2,
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                            '&:hover': {
+                                background: 'rgba(255,255,255,1)',
+                                transform: 'scale(1.1)',
+                            }
                         }}
                     >
-                        Login
+                        <ArrowBackIcon />
+                    </Fab>
+                    
+                    <Typography 
+                        variant="h6" 
+                        sx={{ 
+                            color: 'white', 
+                            fontWeight: 700,
+                            textShadow: '0 2px 10px rgba(0,0,0,0.3)',
+                            flex: 1
+                        }}
+                    >
+                        News Details
+                    </Typography>
+                </Box>
+
+                {/* Hero Section */}
+                <HeroSection>
+                    {news.image && (
+                        <>
+                            <HeroImage 
+                                src={news.image} 
+                                alt={news.title}
+                                loading="lazy"
+                            />
+                            <HeroOverlay>
+                                {news.category && (
+                                    <Chip
+                                        label={news.category}
+                                        sx={{
+                                            background: 'linear-gradient(45deg, #FF6B6B, #FF8E53)',
+                                            color: 'white',
+                                            fontWeight: 700,
+                                            mb: 2,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.5px'
+                                        }}
+                                    />
+                                )}
+                                <Typography 
+                                    variant={isMobile ? "h5" : "h3"} 
+                                    sx={{ 
+                                        fontWeight: 800,
+                                        lineHeight: 1.2,
+                                        textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                                        mb: 2
+                                    }}    
+                                >
+                                    {news.title}
+                                </Typography>
+                                
+                                <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                                    <MetaChip
+                                        icon={<TimeIcon />}
+                                        label={formatDate(news.date || news.createdAt)}
+                                        size="small"
+                                    />
+                                    {news.location && (
+                                        <MetaChip
+                                            icon={<LocationIcon />}
+                                            label={news.location}
+                                            size="small"
+                                        />
+                                    )}
+                                    {news.views && (
+                                        <MetaChip
+                                            icon={<ViewIcon />}
+                                            label={`${news.views} views`}
+                                            size="small"
+                                        />
+                                    )}
+                                </Stack>
+                            </HeroOverlay>
+                        </>
+                    )}
+                </HeroSection>
+
+                {/* Content Card */}
+                <ContentCard>
+                    <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                        {!news.image && (
+                            <Typography 
+                                variant={isMobile ? "h4" : "h3"} 
+                                sx={{ 
+                                    fontWeight: 800,
+                                    mb: 3,
+                                    background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                }}
+                            >
+                                {news.title}
+                            </Typography>
+                        )}
+
+                        {/* Video Section */}
+                        {news.video && (
+                            <Box sx={{ mb: 3, borderRadius: 3, overflow: 'hidden', boxShadow: theme.shadows[8] }}>
+                                <iframe
+                                    width="100%"
+                                    height={isMobile ? 200 : 350}
+                                    src={`https://www.youtube.com/embed/${(() => {
+                                        const url = news.video;
+                                        let videoId = '';
+                                        const shortMatch = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
+                                        if (shortMatch && shortMatch[1]) videoId = shortMatch[1];
+                                        else {
+                                            const match = url.match(/(?:v=|\/embed\/|\/live\/|\/shorts\/|\/watch\?v=)([A-Za-z0-9_-]{11})/);
+                                            if (match && match[1]) videoId = match[1];
+                                            else {
+                                                const parts = url.split('/');
+                                                const last = parts[parts.length - 1].split('?')[0];
+                                                videoId = last.length === 11 ? last : url;
+                                            }
+                                        }
+                                        return videoId;
+                                    })()}?autoplay=1`}
+                                    title="YouTube video"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                />
+                            </Box>
+                        )}
+
+                        {/* Content */}
+                        <Typography 
+                            variant="body1" 
+                            sx={{ 
+                                fontSize: { xs: '1rem', sm: '1.1rem' },
+                                lineHeight: 1.8,
+                                color: theme.palette.text.primary,
+                                mb: 4,
+                                textAlign: 'justify'
+                            }}
+                        >
+                            {news.content}
+                        </Typography>
+
+                        {/* Author and Meta Info */}
+                        <Box sx={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: 2,
+                            pt: 2,
+                            borderTop: `1px solid ${theme.palette.divider}`
+                        }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <Avatar 
+                                    sx={{ 
+                                        bgcolor: theme.palette.primary.main,
+                                        width: 40,
+                                        height: 40,
+                                        fontSize: '1.1rem',
+                                        fontWeight: 600
+                                    }}
+                                >
+                                    {news.author?.[0] || 'A'}
+                                </Avatar>
+                                <Box>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                        {news.author || 'Anonymous'}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Journalist
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            {/* Action Buttons */}
+                            <Stack direction="row" spacing={1}>
+                                <LikeButton 
+                                    liked={liked}
+                                    onClick={handleLike}
+                                    aria-label={liked ? 'Unlike' : 'Like'}
+                                >
+                                    {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                                </LikeButton>
+                                
+                                <ActionButton onClick={handleShare} aria-label="Share">
+                                    <ShareIcon />
+                                </ActionButton>
+                                
+                                <ActionButton aria-label="Bookmark">
+                                    <BookmarkIcon />
+                                </ActionButton>
+                            </Stack>
+                        </Box>
+
+                        {/* Likes Count */}
+                        <Typography 
+                            variant="body2" 
+                            sx={{ 
+                                mt: 2, 
+                                color: theme.palette.text.secondary,
+                                textAlign: 'center'
+                            }}
+                        >
+                            {likes} {likes === 1 ? 'person likes' : 'people like'} this article
+                        </Typography>
+                    </CardContent>
+                </ContentCard>
+
+                {/* Comments Section */}
+                <CommentsContainer elevation={0}>
+                    <Typography 
+                        variant="h5" 
+                        sx={{ 
+                            mb: 3,
+                            fontWeight: 700,
+                            background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                        }}
+                    >
+                        Comments ({comments.length})
+                    </Typography>
+                    
+                    {isLoggedIn && (
+                        <Box sx={{ mb: 3 }}>
+                            <CommentInput
+                                label="Share your thoughts..."
+                                variant="outlined"
+                                value={newComment}
+                                onChange={e => setNewComment(e.target.value)}
+                                multiline
+                                rows={3}
+                                fullWidth
+                            />
+                            <Button
+                                startIcon={<CommentIcon />}
+                                variant="contained"
+                                color="primary"
+                                sx={{ 
+                                    mt: 2, 
+                                    borderRadius: 3, 
+                                    fontWeight: 600,
+                                    background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                                    '&:hover': {
+                                        background: 'linear-gradient(45deg, #764ba2, #667eea)',
+                                    }
+                                }}
+                                onClick={handleAddComment}
+                            >
+                                Post Comment
+                            </Button>
+                        </Box>
+                    )}
+                    
+                    {comments.slice(0, visibleComments).map((comment, idx) => (
+                        <CommentCard key={idx} sx={{ mb: 2, p: 2, borderRadius: 2, backgroundColor: 'rgba(0,0,0,0.02)' }}>
+                            <Avatar sx={{ 
+                                bgcolor: 'primary.main', 
+                                width: 36, 
+                                height: 36,
+                                mr: 2
+                            }}>
+                                {comment.user?.[0] || 'A'}
+                            </Avatar>
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                    {comment.user}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.5 }}>
+                                    {comment.comment}
+                                </Typography>
+                            </Box>
+                        </CommentCard>
+                    ))}
+                    
+                    {comments.length > visibleComments && (
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            sx={{ 
+                                mt: 2, 
+                                borderRadius: 3,
+                                width: '100%',
+                                textTransform: 'none',
+                                fontWeight: 600
+                            }}
+                            onClick={handleLoadMoreComments}
+                        >
+                            Load More Comments
+                        </Button>
+                    )}
+                </CommentsContainer>
+            </Container>
+
+            {/* Related News Section */}
+            <RelatedNews 
+                currentNewsId={id} 
+                category={news.category}
+                onNewsClick={handleNewsClick}
+            />
+
+            {/* Modern Bottom Navigation */}
+            <ModernBottomNav
+                onPrevious={handlePrevious}
+                onNext={handleNext}
+                onHome={handleGoHome}
+                hasPrevious={!!prevId}
+                hasNext={!!nextId}
+                currentPage="details"
+            />
+
+            {/* Authentication Required Dialog */}
+            <Dialog 
+                open={showAuthDialog} 
+                onClose={() => setShowAuthDialog(false)}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 4,
+                        maxWidth: 400,
+                        m: 2
+                    }
+                }}
+            >
+                <DialogTitle sx={{ 
+                    textAlign: 'center',
+                    pb: 1,
+                    background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                    color: 'white',
+                    fontWeight: 700
+                }}>
+                    Login Required
+                </DialogTitle>
+                <DialogContent sx={{ pt: 3, textAlign: 'center' }}>
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                        Please login to interact with news articles.
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        You can like, comment, and bookmark articles after logging in.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 3, justifyContent: 'space-between' }}>
+                    <Button
+                        onClick={() => setShowAuthDialog(false)}
+                        color="inherit"
+                        sx={{ 
+                            borderRadius: 3,
+                            textTransform: 'none',
+                            fontWeight: 600
+                        }}
+                    >
+                        Continue Reading
                     </Button>
-                    <Button onClick={() => setShowAuthDialog(false)} color="secondary">
-                        Cancel
+                    <Button
+                        onClick={() => {
+                            setShowAuthDialog(false);
+                            navigate('/login');
+                        }}
+                        variant="contained"
+                        sx={{ 
+                            borderRadius: 3,
+                            background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            '&:hover': {
+                                background: 'linear-gradient(45deg, #764ba2, #667eea)',
+                            }
+                        }}
+                    >
+                        Login Now
                     </Button>
                 </DialogActions>
             </Dialog>

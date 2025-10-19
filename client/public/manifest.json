@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "સ્વદેશ સંદેશ સમાચાર",
+  "name": "SSN News - Gujarat Local News",
+  "description": "Your trusted source for Gujarat local news, sports, technology, and crime updates",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,18 +9,44 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "logo152.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "152x152",
+      "purpose": "any maskable"
     },
     {
-      "src": "logo512.png",
+      "src": "logo192.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo152.png",
+      "type": "image/png",
+      "sizes": "152x152",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/UserHome",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "orientation": "portrait",
+  "theme_color": "#ed6c02",
+  "background_color": "#ffffff",
+  "categories": ["news", "social"],
+  "shortcuts": [
+    {
+      "name": "Latest News",
+      "short_name": "Latest",
+      "description": "View latest news updates",
+      "url": "/UserHome",
+      "icons": [{ "src": "logo152.png", "sizes": "152x152" }]
+    },
+    {
+      "name": "Sports News",
+      "short_name": "Sports",
+      "description": "Sports news and updates",
+      "url": "/UserHome?category=sports",
+      "icons": [{ "src": "logo152.png", "sizes": "152x152" }]
+    }
+  ]
 }
