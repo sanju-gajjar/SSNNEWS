@@ -4,9 +4,9 @@ import UploadButton from '../UI/UploadButton';
 import { Card, CardContent, CardHeader, Grid, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from "@mui/material";
 import ColorSlider from '../UI/ColorSlider';
 import AdminTopCss from './AdminTopPanel.css';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 
-const API_URL = process.env.REACT_APP_API_URL;
+// Using axiosInstance instead of API_URL
 
 function AdminTopPanel() {
   const [open, setOpen] = useState(false);
@@ -62,7 +62,7 @@ function AdminTopPanel() {
         comments: Array.isArray(comments) ? comments : [],
         createdAt: createdAt ? new Date(createdAt) : new Date()
       };
-      const response = await axios.post(`${API_URL}/news`, payload);
+      const response = await axiosInstance.post(`/news`, payload);
       alert('News added successfully!');
       handleClose();
     } catch (error) {

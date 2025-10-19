@@ -33,14 +33,14 @@ fi
 
 if [ ! -f "client/.env" ]; then
     echo "⚙️  Creating client .env file..."
-    echo "REACT_APP_API_URL=http://localhost:8080" > client/.env
+    echo "REACT_APP_API_URL=https://ssnnewsserver.onrender.com" > client/.env
 fi
 
 echo "✅ Setup complete!"
 echo "🔥 Starting development servers..."
 echo ""
 echo "🌐 Client will be available at: http://localhost:3000"
-echo "🔧 Server will be available at: http://localhost:8080"
+echo "🔧 Server will be available at: https://ssnnewsserver.onrender.com"
 echo ""
 
 # Start both client and server

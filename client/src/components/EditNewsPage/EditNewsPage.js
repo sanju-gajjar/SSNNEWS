@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Grid, TextField, Button, IconButton } from '@mui/material';
 import { Visibility } from '@mui/icons-material';
-import axios from 'axios';
-const API_URL = process.env.REACT_APP_API_URL;
+import axiosInstance from '../../api/axiosInstance';
+// Using axiosInstance instead of API_URL
 function EditNewsPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,7 +19,7 @@ function EditNewsPage() {
     if (!newsDataFromState && idFromQuery) {
       const fetchNews = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/news/${idFromQuery}`);
+          const response = await axiosInstance.get(`/news/${idFromQuery}`);
           setFormData(response.data);
         } catch (error) {
           console.error('Failed to fetch news:', error);
@@ -37,7 +37,7 @@ function EditNewsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/news/${formData._id}/update`, formData);
+      await axiosInstance.post(`/news/${formData._id}/update`, formData);
       navigate('/admin');
     } catch (error) {
       console.error('Failed to update news:', error);

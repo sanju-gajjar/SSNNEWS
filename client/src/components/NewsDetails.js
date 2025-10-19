@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import {
     Box,
     Typography,
@@ -39,7 +39,7 @@ import Loader from './Loader';
 import ModernBottomNav from './BottomNavigation/ModernBottomNav';
 import RelatedNews from './RelatedNews/RelatedNews';
 
-const API_URL = process.env.REACT_APP_API_URL;
+// Using axiosInstance instead of API_URL
 
 // Animations
 const fadeInUp = keyframes`
@@ -231,7 +231,7 @@ const NewsDetails = ({ userName, userLocation }) => {
     useEffect(() => {
         let isMounted = true;
         setLoading(true);
-        axios.get(`${API_URL}/news/${id}`)
+        axiosInstance.get(`/news/${id}`)
             .then(response => {
                 if (isMounted) {
                     setNews(response.data);
@@ -246,7 +246,7 @@ const NewsDetails = ({ userName, userLocation }) => {
                 if (isMounted) setLoading(false);
             });
         // Fetch all news IDs for navigation
-        axios.get(`${API_URL}/news`)
+        axiosInstance.get(`/news`)
             .then(response => {
                 if (isMounted) setAllNewsIds(response.data);
             })
@@ -257,7 +257,7 @@ const NewsDetails = ({ userName, userLocation }) => {
     }, [id]);
 
     useEffect(() => {
-        axios.post(`${API_URL}/news/comments`, { id })
+        axiosInstance.post(`/news/comments`, { id })
             .then(response => setComments(response.data))
             .catch(error => console.error(error));
     }, [id]);
@@ -273,7 +273,7 @@ const NewsDetails = ({ userName, userLocation }) => {
     const handleAddComment = () => {
         if (!handleRequireAuth('comment')) return;
         if (newComment.trim()) {
-            axios.post(`${API_URL}/news/comments/add`, { id, user: storedUserName || 'Anonymous', comment: newComment })
+            axiosInstance.post(`/news/comments/add`, { id, user: storedUserName || 'Anonymous', comment: newComment })
                 .then(response => {
                     setComments([response.data, ...comments]);
                     setNewComment('');
@@ -285,14 +285,14 @@ const NewsDetails = ({ userName, userLocation }) => {
     const handleLike = () => {
         if (!handleRequireAuth('like')) return;
         if (!liked) {
-            axios.post(`${API_URL}/news/like`, { id })
+            axiosInstance.post(`/news/like`, { id })
                 .then(() => {
                     setLikes(likes + 1);
                     setLiked(true);
                 })
                 .catch(error => console.error(error));
         } else {
-            axios.post(`${API_URL}/news/unlike`, { id })
+            axiosInstance.post(`/news/unlike`, { id })
                 .then(() => {
                     setLikes(likes - 1);
                     setLiked(false);

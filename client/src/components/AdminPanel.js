@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import AdminLeftPanel from './AdminLeftBarPanel/AdminLeftPanel';
 import { Grid } from '@mui/material';
 import AdminRightPanel from './AdminRightPanel/AdminRightPanel';
 import Loader from './Loader'; // Import the Loader component
 
-const API_URL = process.env.REACT_APP_API_URL;
+// Using axiosInstance instead of API_URL
 
 const AdminPanel = () => {
     const [formData, setFormData] = useState({ title: '', content: '', author: '' });
@@ -18,7 +18,7 @@ const AdminPanel = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
-        axios.post(`${API_URL}/news`, formData)
+        axiosInstance.post(`/news`, formData)
             .then(response => alert('News added successfully'))
             .catch(error => console.error(error))
             .finally(() => setLoading(false));

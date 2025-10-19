@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import './NewsUI.css';
 import LiveNews from './LiveNews';
 import NewsHeading from './NewsHeading';
@@ -11,7 +11,7 @@ import EnhancedNewsCard from './EnhancedNewsCard';
 import ModernNewsCard from './ModernNewsCard/ModernNewsCard';
 import { Box, Grid, Card, CardContent, CardMedia, Typography, Container } from '@mui/material';
 
-const API_URL = process.env.REACT_APP_API_URL;
+// Using axiosInstance instead of API_URL
 
 const NewsList = () => {
     const [newsList, setNewsList] = useState([]);
@@ -19,12 +19,12 @@ const NewsList = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`${API_URL}/news`)
+        axiosInstance.get(`/news`)
             .then(response => setNewsList(response.data))
             .catch(error => console.error(error));
 
         // Fetch external news
-        axios.post(`${API_URL}/external-news/fetch-and-store`)
+        axiosInstance.post(`/external-news/fetch-and-store`)
             .then(response => setExternalNews(response.data.news || []))
             .catch(error => console.error(error));
     }, []);

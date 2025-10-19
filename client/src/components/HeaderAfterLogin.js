@@ -3,9 +3,9 @@ import { AppBar, Toolbar, Typography, IconButton, Box, Button, Menu, MenuItem, D
 import MenuIcon from '@mui/icons-material/Menu';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
-const API_URL = process.env.REACT_APP_API_URL;
+// Using axiosInstance instead of API_URL
 const HeaderAfterLogin = ({ userName, userLocation: initialDistrict, burgerMenu }) => {
     const [anchorElLocation, setAnchorElLocation] = useState(null);
     const [anchorElUser, setAnchorElUser] = useState(null);
@@ -39,7 +39,7 @@ const HeaderAfterLogin = ({ userName, userLocation: initialDistrict, burgerMenu 
         setAnchorElLocation(null);
 
         try {
-            await axios.post(`${API_URL}/update-district`, { district, userName });
+            await axiosInstance.post(`/update-district`, { district, userName });
             alert(`District updated to ${district}`);
         } catch (error) {
             console.error('Error updating district:', error);

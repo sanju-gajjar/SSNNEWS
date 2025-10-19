@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // Import axios for API calls
+import axiosInstance from '../api/axiosInstance'; // Import axiosInstance for API calls
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 // Removed unused import for 'bg'
 // Removed unused import for 'Button'
@@ -33,7 +33,7 @@ const CustomTextField = styled(TextField)({
     },
 });
 
-const API_URL = process.env.REACT_APP_API_URL;
+// Using axiosInstance instead of API_URL
 
 const Registration = () => {
     const [name, setName] = useState('');
@@ -47,7 +47,7 @@ const Registration = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await axios.post(`${API_URL}/register`, { name, email, password });
+            const response = await axiosInstance.post(`/register`, { name, email, password });
             setMessage(response.data.message);
             if (response.data.message === 'User registered successfully') {
                 navigate('/');

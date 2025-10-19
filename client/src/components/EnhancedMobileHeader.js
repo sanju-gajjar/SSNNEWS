@@ -27,9 +27,9 @@ import {
     ExitToApp as LogoutIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
-const API_URL = process.env.REACT_APP_API_URL;
+// Using axiosInstance instead of API_URL
 
 const EnhancedMobileHeader = ({ userName, userLocation: initialDistrict, userRole, isLoggedIn, onLogout }) => {
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -108,7 +108,7 @@ const EnhancedMobileHeader = ({ userName, userLocation: initialDistrict, userRol
         localStorage.setItem('userLocation', selectedDistrict);
 
         try {
-            await axios.post(`${API_URL}/update-district`, { district: selectedDistrict, userName });
+            await axiosInstance.post(`/update-district`, { district: selectedDistrict, userName });
         } catch (error) {
             console.error('Error updating district:', error);
         } finally {

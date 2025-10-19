@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // Import axios for API calls
+import axiosInstance from '../api/axiosInstance'; // Use configured axios instance
 import bg from '../images/bg1.jpg';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -7,8 +7,6 @@ import { styled } from "@mui/material/styles";
 import ButtonBox from './UI/ButtonBox';
 import Para from './UI/Para';
 import { useNavigate } from 'react-router-dom';
-
-const API_URL = process.env.REACT_APP_API_URL;
 
 const CustomTextField = styled(TextField)({
   "& div.MuiFormControl-root": {
@@ -43,7 +41,7 @@ const Login = ({ setIsLoggedIn, setUserName, setUserLocation, setUserRole }) => 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const response = await axios.post(`${API_URL}/login`, { email, password });
+        const response = await axiosInstance.post('/login', { email, password });
         setMessage(response.data.message);
         if (response.data.message === 'Login successful') {
           // Set localStorage values

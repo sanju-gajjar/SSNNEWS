@@ -6,10 +6,10 @@ import TextBox from '../UI/TextBox';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import { Grid, Button } from '@mui/material';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = process.env.REACT_APP_API_URL;
+// Using axiosInstance instead of API_URL
 
 function AdminFilterPanel({ category, onCategoryChange }) {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ function AdminFilterPanel({ category, onCategoryChange }) {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get(`${API_URL}/news`, { date });
+      const response = await axiosInstance.get(`/news`, { date });
       setNewsList(response.data);
       if (!response.data || !Array.isArray(response.data) || response.data.length === 0) setError('No news found for selected date.');
     } catch (err) {
@@ -60,7 +60,7 @@ function AdminFilterPanel({ category, onCategoryChange }) {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_URL}/news/${id}`);
+      await axiosInstance.delete(`/news/${id}`);
       fetchNews(selectedDate);
     } catch (error) {
       setError('Failed to delete news.');
