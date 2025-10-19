@@ -9,11 +9,32 @@ const axios = require('axios');
 const path = require('path');
 const { securityMiddleware, validateUserInput, generateSecureJWT } = require('./middleware/security');
 const { authMiddleware, adminMiddleware } = require('./middleware/auth');
+// More flexible CORS configuration for production
 const corsOptions = {
-    origin: ['http://localhost:3000', 'https://ssanews.onrender.com'], // Allow both origins
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS for preflight
-    allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
-    credentials: true, // Allow credentials if needed
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or Postman)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:3001', 
+            'https://ssanews.onrender.com',
+            'https://ssnnewsserver.onrender.com',
+            'https://ssnnews.onrender.com'
+        ];
+        
+        // Allow any render.com subdomain
+        if (origin.includes('onrender.com') || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        
+        console.log('CORS blocked origin:', origin);
+        callback(new Error('Not allowed by CORS'));
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    credentials: true,
+    optionsSuccessStatus: 200
 };
 
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
@@ -52,9 +73,10 @@ app.get('/ping', (req, res) => {
     res.status(200).send({ status: 'ok', message: 'pong' });
 });
 
-// Middleware to log API calls
+// Middleware to log API calls with more details
 app.use((req, res, next) => {
-    console.log(`[INFO] ${req.method} request received for ${req.url}`);
+    console.log(`[INFO] ${req.method} ${req.url} from origin: ${req.get('Origin') || 'No origin'}`);
+    console.log(`[INFO] User-Agent: ${req.get('User-Agent')}`);
     next();
 });
 
