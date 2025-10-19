@@ -62,7 +62,14 @@ const Login = ({ setIsLoggedIn, setUserName, setUserLocation, setUserRole }) => 
           navigate('/');
         }
     } catch (error) {
-        setMessage(error.response?.data?.message || 'Login failed');
+        console.error('Login Error:', error);
+        if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
+            setMessage('Network error: Please check your internet connection and try again.');
+        } else if (error.response) {
+            setMessage(error.response.data?.message || `Server error: ${error.response.status}`);
+        } else {
+            setMessage('Connection failed: Unable to reach server. Please try again later.');
+        }
     }
   };
 
