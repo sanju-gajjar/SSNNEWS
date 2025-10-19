@@ -1,7 +1,7 @@
 // Debug script to test admin login
 const axios = require('axios');
 
-const API_URL = 'https://ssnnewsserver.onrender.com';
+const API_URL = 'http://localhost:8080';
 
 async function testAdminLogin() {
     try {

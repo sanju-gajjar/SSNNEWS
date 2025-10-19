@@ -19,7 +19,7 @@ const corsOptions = {
             'http://localhost:3000',
             'http://localhost:3001', 
             'https://ssanews.onrender.com',
-            'https://ssnnewsserver.onrender.com',
+            'http://localhost:8080',
             'https://ssnnews.onrender.com'
         ];
         
@@ -489,11 +489,24 @@ app.post('/external-news/fetch-and-store', async (req, res) => {
         res.status(500).send({ message: 'Failed to fetch and store external news', error: err.message });
     }
 });
+
+// === EXTERNAL API ROUTES ===
+// Import and use external API routes
+const externalApiRoutes = require('./routes/externalApiRoutes');
+app.use('/api/external', externalApiRoutes);
+
+// Initialize cron jobs for data fetching
+const cronManager = require('./middleware/cronManager');
+cronManager.init();
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
 });
+
+//const PORT = process.env.PORT || 8080;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server listening on port ${PORT}`);
+    console.log(`External APIs available at: http://localhost:${PORT}/api/external/`);
 });
 
 // Redirect to login if path not found

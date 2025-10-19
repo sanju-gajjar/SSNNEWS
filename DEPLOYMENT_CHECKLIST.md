@@ -48,5 +48,5 @@ npm start
 ## URLs to Update:
 
 Replace these in your Render environment:
-- `REACT_APP_API_URL=https://ssnnewsserver.onrender.com`
+- `REACT_APP_API_URL=http://localhost:8080`
 - Update CORS origins to match your actual Render URLs

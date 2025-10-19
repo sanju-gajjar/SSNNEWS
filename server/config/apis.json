@@ -1,0 +1,99 @@
+{
+  "apis": {
+    "weather": {
+      "enabled": true,
+      "refreshInterval": 30,
+      "cache": true,
+      "cacheExpiry": 1800,
+      "source": "openweathermap",
+      "cities": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar"]
+    },
+    "horoscope": {
+      "enabled": true,
+      "refreshInterval": 1440,
+      "cache": true,
+      "cacheExpiry": 86400,
+      "source": "aztro",
+      "signs": ["aries", "taurus", "gemini", "cancer", "leo", "virgo", "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces"]
+    },
+    "goldRates": {
+      "enabled": true,
+      "refreshInterval": 60,
+      "cache": true,
+      "cacheExpiry": 3600,
+      "source": "goldapi",
+      "currencies": ["INR"],
+      "metals": ["gold", "silver"]
+    },
+    "fuelPrices": {
+      "enabled": true,
+      "refreshInterval": 1440,
+      "cache": true,
+      "cacheExpiry": 86400,
+      "source": "dailyfuelprice",
+      "states": ["Gujarat", "Maharashtra", "Rajasthan"]
+    },
+    "sports": {
+      "enabled": true,
+      "refreshInterval": 15,
+      "cache": true,
+      "cacheExpiry": 900,
+      "source": "cricapi",
+      "sports": ["cricket", "football"]
+    },
+    "entertainment": {
+      "enabled": true,
+      "refreshInterval": 120,
+      "cache": true,
+      "cacheExpiry": 7200,
+      "source": "youtube",
+      "categories": ["trending", "bollywood", "gujarati"]
+    },
+    "events": {
+      "enabled": true,
+      "refreshInterval": 720,
+      "cache": true,
+      "cacheExpiry": 43200,
+      "source": "custom",
+      "regions": ["Gujarat", "India"]
+    },
+    "rssFeeds": {
+      "enabled": true,
+      "refreshInterval": 60,
+      "cache": true,
+      "cacheExpiry": 3600,
+      "sources": [
+        {
+          "name": "Sandesh",
+          "url": "https://sandesh.com/feed/",
+          "language": "gujarati"
+        },
+        {
+          "name": "Divya Bhaskar",
+          "url": "https://www.divyabhaskar.co.in/rss/",
+          "language": "gujarati"
+        },
+        {
+          "name": "Gujarat Samachar",
+          "url": "https://www.gujaratsamachar.com/rss/",
+          "language": "gujarati"
+        },
+        {
+          "name": "ABP Asmita",
+          "url": "https://abpasmita.abplive.com/rss/",
+          "language": "gujarati"
+        }
+      ]
+    }
+  },
+  "cron": {
+    "enabled": true,
+    "dailyRefresh": "0 5 0 * * *",
+    "timezone": "Asia/Kolkata"
+  },
+  "cache": {
+    "type": "mongodb",
+    "collection": "api_cache",
+    "defaultExpiry": 3600
+  }
+}

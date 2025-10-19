@@ -9,6 +9,10 @@ import CrimeNews from './CrimeNews';
 import SportsNews from './SportsNews';
 import EnhancedNewsCard from './EnhancedNewsCard';
 import ModernNewsCard from './ModernNewsCard/ModernNewsCard';
+import WeatherWidget from './widgets/WeatherWidget';
+import HoroscopeWidget from './widgets/HoroscopeWidget';
+import GoldRatesWidget from './widgets/GoldRatesWidget';
+import CricketWidget from './widgets/CricketWidget';
 import { Box, Grid, Card, CardContent, CardMedia, Typography, Container } from '@mui/material';
 
 // Using axiosInstance instead of API_URL
@@ -87,6 +91,70 @@ const NewsList = () => {
                         </Grid>
                     </Box>
                 )}
+
+                {/* Weather Widget Section */}
+                <Box sx={{ mb: 4 }}>
+                    <Typography 
+                        variant="h5" 
+                        sx={{ 
+                            mb: 3,
+                            fontWeight: 700,
+                            color: '#333',
+                            textAlign: 'center'
+                        }}
+                    >
+                        Gujarat Weather
+                    </Typography>
+                    <WeatherWidget language="gujarati" compact={false} />
+                </Box>
+
+                {/* Horoscope Widget Section */}
+                <Box sx={{ mb: 4 }}>
+                    <Typography 
+                        variant="h5" 
+                        sx={{ 
+                            mb: 3,
+                            fontWeight: 700,
+                            color: '#333',
+                            textAlign: 'center'
+                        }}
+                    >
+                        Daily Horoscope
+                    </Typography>
+                    <HoroscopeWidget language="gujarati" compact={false} />
+                </Box>
+
+                {/* Gold Rates Widget Section */}
+                <Box sx={{ mb: 4 }}>
+                    <Typography 
+                        variant="h5" 
+                        sx={{ 
+                            mb: 3,
+                            fontWeight: 700,
+                            color: '#333',
+                            textAlign: 'center'
+                        }}
+                    >
+                        Gold & Silver Rates
+                    </Typography>
+                    <GoldRatesWidget language="gujarati" compact={false} />
+                </Box>
+
+                {/* Cricket Live Updates Widget Section */}
+                <Box sx={{ mb: 4 }}>
+                    <Typography 
+                        variant="h5" 
+                        sx={{ 
+                            mb: 3,
+                            fontWeight: 700,
+                            color: '#333',
+                            textAlign: 'center'
+                        }}
+                    >
+                        Cricket Live Updates
+                    </Typography>
+                    <CricketWidget />
+                </Box>
 
                 {/* More News Section */}
                 {sortedNewsList.length > 6 && (

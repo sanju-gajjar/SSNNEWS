@@ -69,7 +69,7 @@ const EnhancedMobileHeader = ({ userName, userLocation: initialDistrict, userRol
 
     // Check userRole from both props and localStorage
     const currentUserRole = userRole || localStorage.getItem('userRole');
-    const currentIsLoggedIn = isLoggedIn || !!localStorage.getItem('isLoggedIn');
+    const currentIsLoggedIn = isLoggedIn || localStorage.getItem('isLoggedIn') === 'true';
     
 
 
@@ -125,6 +125,8 @@ const EnhancedMobileHeader = ({ userName, userLocation: initialDistrict, userRol
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('userName');
         localStorage.removeItem('userLocation');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('token');
         onLogout();
         navigate('/');
     };

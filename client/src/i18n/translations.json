@@ -1,0 +1,527 @@
+{
+  "common": {
+    "loading": {
+      "gujarati": "લોડ કરી રહ્યું છે...",
+      "hindi": "लोड हो रहा है...",
+      "english": "Loading..."
+    },
+    "error": {
+      "gujarati": "ભૂલ",
+      "hindi": "त्रुटि",
+      "english": "Error"
+    },
+    "refresh": {
+      "gujarati": "રિફ્રેશ કરો",
+      "hindi": "रीफ्रेश करें", 
+      "english": "Refresh"
+    },
+    "lastUpdated": {
+      "gujarati": "છેલ્લે અપડેટ:",
+      "hindi": "अंतिम अपडेट:",
+      "english": "Last Updated:"
+    },
+    "today": {
+      "gujarati": "આજે",
+      "hindi": "आज",
+      "english": "Today"
+    },
+    "yesterday": {
+      "gujarati": "ગઈકાલે",
+      "hindi": "कल",
+      "english": "Yesterday"
+    },
+    "notAvailable": {
+      "gujarati": "ઉપલબ્ધ નથી",
+      "hindi": "उपलब्ध नहीं",
+      "english": "Not Available"
+    }
+  },
+  "weather": {
+    "title": {
+      "gujarati": "હવામાન",
+      "hindi": "मौसम",
+      "english": "Weather"
+    },
+    "temperature": {
+      "gujarati": "તાપમાન",
+      "hindi": "तापमान",
+      "english": "Temperature"
+    },
+    "feelsLike": {
+      "gujarati": "અનુભવાય છે",
+      "hindi": "महसूस होता है",
+      "english": "Feels Like"
+    },
+    "humidity": {
+      "gujarati": "ભેજ",
+      "hindi": "आर्द्रता",
+      "english": "Humidity"
+    },
+    "windSpeed": {
+      "gujarati": "પવનની ઝડપ",
+      "hindi": "हवा की गति",
+      "english": "Wind Speed"
+    },
+    "pressure": {
+      "gujarati": "દબાણ",
+      "hindi": "दबाव",
+      "english": "Pressure"
+    },
+    "visibility": {
+      "gujarati": "દૃશ્યતા",
+      "hindi": "दृश्यता",
+      "english": "Visibility"
+    },
+    "sunrise": {
+      "gujarati": "સૂર્યોદય",
+      "hindi": "सूर्योदय",
+      "english": "Sunrise"
+    },
+    "sunset": {
+      "gujarati": "સૂર્યાસ્ત",
+      "hindi": "सूर्यास्त",
+      "english": "Sunset"
+    },
+    "forecast": {
+      "gujarati": "આગાહી",
+      "hindi": "पूर्वानुमान",
+      "english": "Forecast"
+    },
+    "conditions": {
+      "clearSky": {
+        "gujarati": "સાફ આકાશ",
+        "hindi": "साफ आसमान",
+        "english": "Clear Sky"
+      },
+      "fewClouds": {
+        "gujarati": "થોડા વાદળ",
+        "hindi": "कुछ बादल",
+        "english": "Few Clouds"
+      },
+      "scatteredClouds": {
+        "gujarati": "વિખરાયેલા વાદળ",
+        "hindi": "बिखरे हुए बादल",
+        "english": "Scattered Clouds"
+      },
+      "brokenClouds": {
+        "gujarati": "તૂટેલા વાદળ",
+        "hindi": "टूटे हुए बादल",
+        "english": "Broken Clouds"
+      },
+      "rain": {
+        "gujarati": "વરસાદ",
+        "hindi": "बारिश",
+        "english": "Rain"
+      },
+      "thunderstorm": {
+        "gujarati": "વાવાઝોડું",
+        "hindi": "आंधी",
+        "english": "Thunderstorm"
+      }
+    }
+  },
+  "horoscope": {
+    "title": {
+      "gujarati": "રાશિફળ",
+      "hindi": "राशिफल",
+      "english": "Horoscope"
+    },
+    "dailyHoroscope": {
+      "gujarati": "દૈનિક રાશિફળ",
+      "hindi": "दैनिक राशिफल",
+      "english": "Daily Horoscope"
+    },
+    "weeklyHoroscope": {
+      "gujarati": "સાપ્તાહિક રાશિફળ",
+      "hindi": "साप्ताहिक राशिफल",
+      "english": "Weekly Horoscope"
+    },
+    "monthlyHoroscope": {
+      "gujarati": "માસિક રાશિફળ",
+      "hindi": "मासिक राशिफल",
+      "english": "Monthly Horoscope"
+    },
+    "luckyNumber": {
+      "gujarati": "ભાગ્યાંક",
+      "hindi": "भाग्यांक",
+      "english": "Lucky Number"
+    },
+    "luckyColor": {
+      "gujarati": "ભાગ્યશાળી રંગ",
+      "hindi": "भाग्यशाली रंग",
+      "english": "Lucky Color"
+    },
+    "luckyTime": {
+      "gujarati": "ભાગ્યશાળી સમય",
+      "hindi": "भाग्यशाली समय",
+      "english": "Lucky Time"
+    },
+    "mood": {
+      "gujarati": "મૂડ",
+      "hindi": "मूड",
+      "english": "Mood"
+    },
+    "compatibility": {
+      "gujarati": "સુસંગતતા",
+      "hindi": "अनुकूलता",
+      "english": "Compatibility"
+    },
+    "signs": {
+      "aries": {
+        "gujarati": "મેષ",
+        "hindi": "मेष",
+        "english": "Aries"
+      },
+      "taurus": {
+        "gujarati": "વૃષભ",
+        "hindi": "वृषभ",
+        "english": "Taurus"
+      },
+      "gemini": {
+        "gujarati": "મિથુન",
+        "hindi": "मिथुन",
+        "english": "Gemini"
+      },
+      "cancer": {
+        "gujarati": "કર્ક",
+        "hindi": "कर्क",
+        "english": "Cancer"
+      },
+      "leo": {
+        "gujarati": "સિંહ",
+        "hindi": "सिंह",
+        "english": "Leo"
+      },
+      "virgo": {
+        "gujarati": "કન્યા",
+        "hindi": "कन्या",
+        "english": "Virgo"
+      },
+      "libra": {
+        "gujarati": "તુલા",
+        "hindi": "तुला",
+        "english": "Libra"
+      },
+      "scorpio": {
+        "gujarati": "વૃશ્ચિક",
+        "hindi": "वृश्चिक",
+        "english": "Scorpio"
+      },
+      "sagittarius": {
+        "gujarati": "ધનુ",
+        "hindi": "धनु",
+        "english": "Sagittarius"
+      },
+      "capricorn": {
+        "gujarati": "મકર",
+        "hindi": "मकर",
+        "english": "Capricorn"
+      },
+      "aquarius": {
+        "gujarati": "કુંભ",
+        "hindi": "कुंभ",
+        "english": "Aquarius"
+      },
+      "pisces": {
+        "gujarati": "મીન",
+        "hindi": "मीन",
+        "english": "Pisces"
+      }
+    }
+  },
+  "goldRates": {
+    "title": {
+      "gujarati": "સોના-ચાંદીના ભાવ",
+      "hindi": "सोना-चांदी के भाव",
+      "english": "Gold & Silver Rates"
+    },
+    "gold": {
+      "gujarati": "સોનું",
+      "hindi": "सोना",
+      "english": "Gold"
+    },
+    "silver": {
+      "gujarati": "ચાંદી",
+      "hindi": "चांदी",
+      "english": "Silver"
+    },
+    "platinum": {
+      "gujarati": "પ્લેટિનમ",
+      "hindi": "प्लेटिनम",
+      "english": "Platinum"
+    },
+    "currentRate": {
+      "gujarati": "વર્તમાન ભાવ",
+      "hindi": "वर्तमान दर",
+      "english": "Current Rate"
+    },
+    "previousRate": {
+      "gujarati": "પાછલો ભાવ",
+      "hindi": "पिछली दर",
+      "english": "Previous Rate"
+    },
+    "change": {
+      "gujarati": "ફેરફાર",
+      "hindi": "परिवर्तन",
+      "english": "Change"
+    },
+    "high": {
+      "gujarati": "ઉચ્ચ",
+      "hindi": "उच्च",
+      "english": "High"
+    },
+    "low": {
+      "gujarati": "નીચ",
+      "hindi": "निम्न",
+      "english": "Low"
+    },
+    "units": {
+      "perGram": {
+        "gujarati": "પ્રતિ ગ્રામ",
+        "hindi": "प्रति ग्राम",
+        "english": "Per Gram"
+      },
+      "per10Gram": {
+        "gujarati": "પ્રતિ 10 ગ્રામ",
+        "hindi": "प्रति 10 ग्राम",
+        "english": "Per 10 Gram"
+      },
+      "perTola": {
+        "gujarati": "પ્રતિ તોલા",
+        "hindi": "प्रति तोला",
+        "english": "Per Tola"
+      },
+      "perOunce": {
+        "gujarati": "પ્રતિ ઔંસ",
+        "hindi": "प्रति औंस",
+        "english": "Per Ounce"
+      }
+    },
+    "marketStatus": {
+      "open": {
+        "gujarati": "બજાર ખુલ્લું",
+        "hindi": "बाजार खुला",
+        "english": "Market Open"
+      },
+      "closed": {
+        "gujarati": "બજાર બંધ",
+        "hindi": "बाजार बंद",
+        "english": "Market Closed"
+      }
+    }
+  },
+  "fuelPrices": {
+    "title": {
+      "gujarati": "બળતણના ભાવ",
+      "hindi": "ईंधन की कीमतें",
+      "english": "Fuel Prices"
+    },
+    "petrol": {
+      "gujarati": "પેટ્રોલ",
+      "hindi": "पेट्रोल",
+      "english": "Petrol"
+    },
+    "diesel": {
+      "gujarati": "ડીઝલ",
+      "hindi": "डीजल", 
+      "english": "Diesel"
+    },
+    "cng": {
+      "gujarati": "સીએનજી",
+      "hindi": "सीएनजी",
+      "english": "CNG"
+    },
+    "lpg": {
+      "gujarati": "એલપીજી",
+      "hindi": "एलपीजी",
+      "english": "LPG"
+    },
+    "perLitre": {
+      "gujarati": "પ્રતિ લિટર",
+      "hindi": "प्रति लीटर",
+      "english": "Per Litre"
+    },
+    "perKg": {
+      "gujarati": "પ્રતિ કિલો",
+      "hindi": "प्रति किलो",
+      "english": "Per Kg"
+    }
+  },
+  "sports": {
+    "title": {
+      "gujarati": "રમતગમત",
+      "hindi": "खेल",
+      "english": "Sports"
+    },
+    "cricket": {
+      "gujarati": "ક્રિકેટ",
+      "hindi": "क्रिकेट",
+      "english": "Cricket"
+    },
+    "football": {
+      "gujarati": "ફૂટબોલ",
+      "hindi": "फुटबॉल",
+      "english": "Football"
+    },
+    "liveScores": {
+      "gujarati": "લાઈવ સ્કોર",
+      "hindi": "लाइव स्कोर",
+      "english": "Live Scores"
+    },
+    "upcomingMatches": {
+      "gujarati": "આગામી મેચ",
+      "hindi": "आगामी मैच",
+      "english": "Upcoming Matches"
+    },
+    "recentResults": {
+      "gujarati": "તાજેતરના પરિણામો",
+      "hindi": "हाल के परिणाम",
+      "english": "Recent Results"
+    }
+  },
+  "entertainment": {
+    "title": {
+      "gujarati": "મનોરંજન",
+      "hindi": "मनोरंजन",
+      "english": "Entertainment"
+    },
+    "trending": {
+      "gujarati": "ટ્રેંડિંગ",
+      "hindi": "ट्रेंडिंग",
+      "english": "Trending"
+    },
+    "bollywood": {
+      "gujarati": "બોલિવૂડ",
+      "hindi": "बॉलीवुड",
+      "english": "Bollywood"
+    },
+    "gujarati": {
+      "gujarati": "ગુજરાતી",
+      "hindi": "गुजराती",
+      "english": "Gujarati"
+    },
+    "music": {
+      "gujarati": "સંગીત",
+      "hindi": "संगीत",
+      "english": "Music"
+    },
+    "movies": {
+      "gujarati": "ફિલ્મો",
+      "hindi": "फिल्में",
+      "english": "Movies"
+    }
+  },
+  "events": {
+    "title": {
+      "gujarati": "ઇવેન્ટ્સ",
+      "hindi": "इवेंट्स",
+      "english": "Events"
+    },
+    "festivals": {
+      "gujarati": "તહેવારો",
+      "hindi": "त्यौहार",
+      "english": "Festivals"
+    },
+    "localEvents": {
+      "gujarati": "સ્થાનિક ઇવેન્ટ્સ",
+      "hindi": "स्थानीय इवेंट्स",
+      "english": "Local Events"
+    },
+    "upcoming": {
+      "gujarati": "આગામી",
+      "hindi": "आगामी",
+      "english": "Upcoming"
+    },
+    "today": {
+      "gujarati": "આજે",
+      "hindi": "आज",
+      "english": "Today"
+    }
+  },
+  "navigation": {
+    "home": {
+      "gujarati": "મુખ્ય",
+      "hindi": "मुख्य",
+      "english": "Home"
+    },
+    "news": {
+      "gujarati": "સમાચાર",
+      "hindi": "समाचार",
+      "english": "News"
+    },
+    "weather": {
+      "gujarati": "હવામાન",
+      "hindi": "मौसम",
+      "english": "Weather"
+    },
+    "horoscope": {
+      "gujarati": "રાશિફળ",
+      "hindi": "राशिफल",
+      "english": "Horoscope"
+    },
+    "goldRates": {
+      "gujarati": "સોના-ચાંદીના ભાવ",
+      "hindi": "सोना-चांदी के भाव",
+      "english": "Gold Rates"
+    },
+    "fuelPrices": {
+      "gujarati": "બળતણના ભાવ",
+      "hindi": "ईंधन की कीमतें",
+      "english": "Fuel Prices"
+    },
+    "sports": {
+      "gujarati": "રમતગમત",
+      "hindi": "खेल",
+      "english": "Sports"
+    },
+    "entertainment": {
+      "gujarati": "મનોરંજન",
+      "hindi": "मनोरंजन",
+      "english": "Entertainment"
+    },
+    "events": {
+      "gujarati": "ઇવેન્ટ્સ",
+      "hindi": "इवेंट्स",
+      "english": "Events"
+    }
+  },
+  "time": {
+    "minutesAgo": {
+      "gujarati": "મિનિટ પહેલાં",
+      "hindi": "मिनट पहले",
+      "english": "minutes ago"
+    },
+    "hoursAgo": {
+      "gujarati": "કલાક પહેલાં",
+      "hindi": "घंटे पहले",
+      "english": "hours ago"
+    },
+    "daysAgo": {
+      "gujarati": "દિવસ પહેલાં",
+      "hindi": "दिन पहले",
+      "english": "days ago"
+    },
+    "justNow": {
+      "gujarati": "હમણાં જ",
+      "hindi": "अभी",
+      "english": "Just now"
+    }
+  },
+  "errors": {
+    "networkError": {
+      "gujarati": "નેટવર્ક ભૂલ",
+      "hindi": "नेटवर्क त्रुटि",
+      "english": "Network Error"
+    },
+    "dataNotAvailable": {
+      "gujarati": "ડેટા ઉપલબ્ધ નથી",
+      "hindi": "डेटा उपलब्ध नहीं",
+      "english": "Data Not Available"
+    },
+    "tryAgain": {
+      "gujarati": "ફરી પ્રયાસ કરો",
+      "hindi": "फिर कोशिश करें",
+      "english": "Try Again"
+    }
+  }
+}

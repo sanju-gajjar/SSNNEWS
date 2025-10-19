@@ -7,7 +7,7 @@ services:
     staticPublishPath: build # Adjusted to match the build output folder
     envVars:
       - key: REACT_APP_API_URL
-        value: https://ssnnewsserver.onrender.com/
+        value: http://localhost:8080/
     plan: free
     routes:
       - type: rewrite

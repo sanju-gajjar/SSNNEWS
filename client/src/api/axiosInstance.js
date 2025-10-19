@@ -8,7 +8,7 @@ const getApiUrl = () => {
     }
     
     // Use environment variable or fallback to localhost
-    return process.env.REACT_APP_API_URL || 'https://ssnnewsserver.onrender.com';
+    return process.env.REACT_APP_API_URL || 'http://localhost:8080';
 };
 
 const axiosInstance = axios.create({

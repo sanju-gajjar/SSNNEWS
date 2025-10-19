@@ -10,6 +10,7 @@ import NotFound from './components/NotFound';
 import Login from './components/Login';
 import Registration from './components/Registration';
 import Unauthorized from './components/Unauthorized';
+import ScrollToTop from './components/ScrollToTop';
 
 // Lazy load components for better performance
 const NewsList = lazy(() => import('./components/NewsList'));
@@ -86,6 +87,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <div className="App">
         <Router>
+          <ScrollToTop />
           {/* Show enhanced header for all users, with different features based on login status */}
           <EnhancedMobileHeader
             userName={userName}
@@ -93,6 +95,14 @@ const App = () => {
             userRole={userRole}
             isLoggedIn={isLoggedIn}
             onLogout={() => {
+              // Clear localStorage first
+              localStorage.removeItem('isLoggedIn');
+              localStorage.removeItem('userName'); 
+              localStorage.removeItem('userLocation');
+              localStorage.removeItem('userRole');
+              localStorage.removeItem('token');
+              
+              // Then update state
               setIsLoggedIn(false);
               setUserName('');
               setUserLocation('');
