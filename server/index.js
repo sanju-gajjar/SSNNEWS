@@ -3,10 +3,12 @@ const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt'); // Add this line
-const jwt = require('jsonwebtoken'); // Add this line
-const axios = require('axios'); // For external API requests
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const axios = require('axios');
 const path = require('path');
+const { securityMiddleware, validateUserInput, generateSecureJWT } = require('./middleware/security');
+const { authMiddleware, adminMiddleware } = require('./middleware/auth');
 const corsOptions = {
     origin: ['http://localhost:3000', 'https://ssanews.onrender.com'], // Allow both origins
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS for preflight
@@ -15,7 +17,10 @@ const corsOptions = {
 };
 
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
-app.use(cors(corsOptions)); // Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Apply security middleware
+securityMiddleware(app);
 
 // Handle preflight requests globally
 app.options('*', cors(corsOptions));
@@ -23,8 +28,17 @@ app.options('*', cors(corsOptions));
 // Connect to MongoDB   
 require('dotenv').config();
 
-const jwtSecret = process.env.JWT_SECRET || 'defaultSecretKey';
-const mongoUrl = process.env.MONGODB_URL ;
+// Validate JWT Secret
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret || jwtSecret === 'secret' || jwtSecret === 'defaultSecretKey') {
+    console.warn('⚠️  WARNING: Using weak JWT secret! Please set a strong JWT_SECRET in .env');
+    if (process.env.NODE_ENV === 'production') {
+        console.error('❌ CRITICAL: Cannot use weak JWT secret in production!');
+        process.exit(1);
+    }
+}
+
+const mongoUrl = process.env.MONGODB_URL;
 
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
@@ -98,6 +112,7 @@ const userSchema = new mongoose.Schema({
     name: String,
     email: { type: String, unique: true },
     password: String,
+    role: String,
     location: String
 });
 
@@ -128,13 +143,14 @@ app.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) return res.status(401).send({ message: 'Invalid credentials' });
 
-        const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
-        console.log(`[INFO] User logged in successfully: ${email}`);
+        const token = jwt.sign({ id: user._id, role: user.role }, jwtSecret, { expiresIn: '1h' });
+        console.log(`[INFO] User logged in successfully: ${email}, Role: ${user.role}`);
         res.send({ 
             message: 'Login successful', 
             token, 
-            userName: user.name, 
-            userLocation: user.location // Include location in the response
+            userName: user.userName || user.name, // Handle both userName and name fields
+            userLocation: user.location,
+            userRole: user.role // Include role in the response
         });
     } catch (err) {
         console.error(`[ERROR] Login failed for email: ${req.body.email}`, err);
@@ -147,8 +163,8 @@ const News = mongoose.model('News', newsSchema);
 const ExternalNews = mongoose.model('ExternalNews', externalNewsSchema);
 
 // Routes
-// Admin: Add news
-app.post('/news', async (req, res) => {
+// Admin: Add news (Protected Route)
+app.post('/news', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const {
             title,
@@ -224,7 +240,8 @@ app.get('/news/:id', async (req, res) => {
 // User: Get news details by ID (GET)
 
 // Admin: Update news by ID (POST)
-app.post('/news/:id/update', async (req, res) => {
+// Admin: Update news (Protected Route)
+app.post('/news/:id/update', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const news = await News.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!news) return res.status(404).send({ message: 'News not found' });
@@ -236,7 +253,8 @@ app.post('/news/:id/update', async (req, res) => {
 });
 
 // Admin: Delete news by ID (DELETE)
-app.delete('/news/:id', async (req, res) => {
+// Admin: Delete news (Protected Route)
+app.delete('/news/:id', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const news = await News.findByIdAndDelete(req.params.id);
         if (!news) return res.status(404).send({ message: 'News not found' });
