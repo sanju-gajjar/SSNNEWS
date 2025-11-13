@@ -352,7 +352,7 @@ const ModernNewsCard = ({
                                     }
                                 }}
                             >
-                                {news.author.charAt(0).toUpperCase()}
+                                {(news.author || 'A').charAt(0).toUpperCase()}
                             </Avatar>
                             <Typography 
                                 variant="body2" 

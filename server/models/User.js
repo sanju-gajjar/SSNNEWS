@@ -1,14 +1,12 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    userName: { 
-        type: String, 
-        required: true, 
-        unique: true,
+    name: {
+        type: String,
+        required: true,
         trim: true,
         minlength: 2,
-        maxlength: 50,
-        index: true
+        maxlength: 50
     },
     email: {
         type: String,
@@ -38,7 +36,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin', 'moderator'],
+        enum: ['user', 'admin', 'moderator', 'reporter'],
         default: 'user'
     },
     isActive: {
@@ -64,6 +62,6 @@ const userSchema = new mongoose.Schema({
 });
 
 // Index for better performance
-userSchema.index({ email: 1, userName: 1 });
+userSchema.index({ email: 1, name: 1 });
 
 module.exports = mongoose.model('User', userSchema);

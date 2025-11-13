@@ -24,10 +24,28 @@ import {
     Notifications as NotificationsIcon,
     AccountCircle as AccountCircleIcon,
     LocationOn as LocationOnIcon,
-    ExitToApp as LogoutIcon
+    ExitToApp as LogoutIcon,
+    Newspaper as NewspaperIcon,
+    Public as PublicIcon,
+    LocationCity as CityIcon,
+    LocationCity as LocationCityIcon,
+    Gavel as PoliticsIcon,
+    Business as BusinessIcon,
+    Sports as SportsIcon,
+    Movie as EntertainmentIcon,
+    Computer as TechIcon,
+    HealthAndSafety as HealthIcon,
+    Style as LifestyleIcon,
+    School as EducationIcon,
+    Comment as OpinionIcon,
+    Article as BlogIcon,
+    Photo as PhotoIcon,
+    VideoLibrary as VideoIcon,
+    WbSunny as WeatherIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
+import { categoryMap } from '../i18n/gujaratiTranslations';
 
 // Using axiosInstance instead of API_URL
 
@@ -52,33 +70,59 @@ const EnhancedMobileHeader = ({ userName, userLocation: initialDistrict, userRol
         'TAPI', 'VADODARA', 'VALSAD'
     ];
 
+    // Define category menu items in Gujarati
+    const categoryMenuItems = [
+        { text: categoryMap.breaking, icon: <NewspaperIcon />, path: '/news/breaking' },
+        { text: categoryMap.national, icon: <PublicIcon />, path: '/news/national' },
+        { text: categoryMap.international, icon: <PublicIcon />, path: '/news/international' },
+        { text: categoryMap.state, icon: <LocationCityIcon />, path: '/news/state' },
+        { text: categoryMap.city, icon: <CityIcon />, path: '/news/city' },
+        { text: categoryMap.politics, icon: <PoliticsIcon />, path: '/news/politics' },
+        { text: categoryMap.business, icon: <BusinessIcon />, path: '/news/business' },
+        { text: categoryMap.sports, icon: <SportsIcon />, path: '/news/sports' },
+        { text: categoryMap.entertainment, icon: <EntertainmentIcon />, path: '/news/entertainment' },
+        { text: categoryMap.technology, icon: <TechIcon />, path: '/news/technology' },
+        { text: categoryMap.health, icon: <HealthIcon />, path: '/news/health' },
+        { text: categoryMap.lifestyle, icon: <LifestyleIcon />, path: '/news/lifestyle' },
+        { text: categoryMap.education, icon: <EducationIcon />, path: '/news/education' },
+        { text: categoryMap.opinion, icon: <OpinionIcon />, path: '/news/opinion' },
+        { text: categoryMap.blog, icon: <BlogIcon />, path: '/news/blog' },
+        { text: categoryMap.photo, icon: <PhotoIcon />, path: '/media/photos' },
+        { text: categoryMap.video, icon: <VideoIcon />, path: '/media/videos' },
+        { text: categoryMap.weather, icon: <WeatherIcon />, path: '/weather' },
+    ];
+
     // Define menu items based on login status and user role
     const publicMenuItems = [
         { text: 'Home', icon: <HomeIcon />, path: '/' },
+        ...categoryMenuItems,
         { text: 'Login', icon: <AccountCircleIcon />, path: '/login' }
     ];
 
     const baseLoggedInMenuItems = [
-        { text: 'Home', icon: <HomeIcon />, path: '/' }
+        { text: 'Home', icon: <HomeIcon />, path: '/' },
+        ...categoryMenuItems
     ];
 
-    const adminMenuItems = [
-        { text: 'Admin Panel', icon: <AccountCircleIcon />, path: '/admin' },
-        { text: 'Edit News', icon: <SearchIcon />, path: '/edit-news' }
+    // Admin sees ONLY these two menus (Dashboard has everything else)
+    const adminOnlyMenuItems = [
+        { text: 'Dashboard', icon: <HomeIcon />, path: '/admin/dashboard' },
+        { text: 'Home', icon: <HomeIcon />, path: '/' }
     ];
 
     // Check userRole from both props and localStorage
     const currentUserRole = userRole || localStorage.getItem('userRole');
     const currentIsLoggedIn = isLoggedIn || localStorage.getItem('isLoggedIn') === 'true';
-    
-
 
     let menuItems;
+    
     if (!currentIsLoggedIn) {
         menuItems = publicMenuItems;
     } else if (currentUserRole === 'admin') {
-        menuItems = [...baseLoggedInMenuItems, ...adminMenuItems];
+        // Admin sees only Dashboard + Home
+        menuItems = adminOnlyMenuItems;
     } else {
+        // Regular users see all categories
         menuItems = baseLoggedInMenuItems;
     }
 
@@ -200,22 +244,26 @@ const EnhancedMobileHeader = ({ userName, userLocation: initialDistrict, userRol
                         )}
                     </IconButton>
 
-                    {/* Notifications */}
-                    <IconButton color="inherit" sx={{ mr: 1 }}>
-                        <Badge badgeContent={0} color="error">
-                            <NotificationsIcon />
-                        </Badge>
-                    </IconButton>
+                    {/* Notifications - Only show when logged in */}
+                    {currentIsLoggedIn && (
+                        <IconButton color="inherit" sx={{ mr: 1 }}>
+                            <Badge badgeContent={0} color="error">
+                                <NotificationsIcon />
+                            </Badge>
+                        </IconButton>
+                    )}
 
-                    {/* User Menu */}
-                    <IconButton color="inherit" onClick={handleUserMenuClick}>
-                        <AccountCircleIcon />
-                        {!isMobile && (
-                            <Typography variant="body2" sx={{ ml: 1, fontSize: '0.8rem' }}>
-                                {userName}
-                            </Typography>
-                        )}
-                    </IconButton>
+                    {/* User Menu - Only show when logged in */}
+                    {currentIsLoggedIn && (
+                        <IconButton color="inherit" onClick={handleUserMenuClick}>
+                            <AccountCircleIcon />
+                            {!isMobile && (
+                                <Typography variant="body2" sx={{ ml: 1, fontSize: '0.8rem' }}>
+                                    {userName}
+                                </Typography>
+                            )}
+                        </IconButton>
+                    )}
                 </Toolbar>
             </AppBar>
 
@@ -242,25 +290,27 @@ const EnhancedMobileHeader = ({ userName, userLocation: initialDistrict, userRol
                 ))}
             </Menu>
 
-            {/* User Menu */}
-            <Menu
-                anchorEl={anchorElUser}
-                open={Boolean(anchorElUser)}
-                onClose={handleUserMenuClose}
-            >
-                <MenuItem disabled>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {userName}
-                    </Typography>
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={handleLogout}>
-                    <ListItemIcon>
-                        <LogoutIcon fontSize="small" />
-                    </ListItemIcon>
-                    Logout
-                </MenuItem>
-            </Menu>
+            {/* User Menu - Only render when logged in */}
+            {currentIsLoggedIn && (
+                <Menu
+                    anchorEl={anchorElUser}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleUserMenuClose}
+                >
+                    <MenuItem disabled>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {userName}
+                        </Typography>
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem onClick={handleLogout}>
+                        <ListItemIcon>
+                            <LogoutIcon fontSize="small" />
+                        </ListItemIcon>
+                        Logout
+                    </MenuItem>
+                </Menu>
+            )}
 
             {/* Mobile Drawer */}
             <Drawer
@@ -317,7 +367,10 @@ const EnhancedMobileHeader = ({ userName, userLocation: initialDistrict, userRol
                             </ListItemIcon>
                             <ListItemText 
                                 primary={item.text}
-                                primaryTypographyProps={{ fontWeight: 500 }}
+                                primaryTypographyProps={{ 
+                                    fontWeight: 500,
+                                    fontFamily: 'Noto Sans Gujarati, sans-serif'
+                                }}
                             />
                         </ListItem>
                     ))}

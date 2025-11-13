@@ -486,35 +486,36 @@ const NewsDetails = ({ userName, userLocation }) => {
                             </Typography>
                         )}
 
-                        {/* Video Section */}
-                        {news.video && (
-                            <Box sx={{ mb: 3, borderRadius: 3, overflow: 'hidden', boxShadow: theme.shadows[8] }}>
-                                <iframe
-                                    width="100%"
-                                    height={isMobile ? 200 : 350}
-                                    src={`https://www.youtube.com/embed/${(() => {
-                                        const url = news.video;
-                                        let videoId = '';
-                                        const shortMatch = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
-                                        if (shortMatch && shortMatch[1]) videoId = shortMatch[1];
-                                        else {
-                                            const match = url.match(/(?:v=|\/embed\/|\/live\/|\/shorts\/|\/watch\?v=)([A-Za-z0-9_-]{11})/);
-                                            if (match && match[1]) videoId = match[1];
-                                            else {
-                                                const parts = url.split('/');
-                                                const last = parts[parts.length - 1].split('?')[0];
-                                                videoId = last.length === 11 ? last : url;
-                                            }
-                                        }
-                                        return videoId;
-                                    })()}?autoplay=1`}
-                                    title="YouTube video"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                />
-                            </Box>
-                        )}
+                        {/* Video Section - Only show if valid YouTube link */}
+                        {news.video && (() => {
+                            const url = news.video;
+                            let videoId = '';
+                            const shortMatch = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
+                            if (shortMatch && shortMatch[1]) videoId = shortMatch[1];
+                            else {
+                                const match = url.match(/(?:v=|\/embed\/|\/live\/|\/shorts\/|\/watch\?v=)([A-Za-z0-9_-]{11})/);
+                                if (match && match[1]) videoId = match[1];
+                                else {
+                                    const parts = url.split('/');
+                                    const last = parts[parts.length - 1].split('?')[0];
+                                    videoId = last.length === 11 ? last : '';
+                                }
+                            }
+                            // Only render if we have a valid video ID
+                            return videoId ? (
+                                <Box sx={{ mb: 3, borderRadius: 3, overflow: 'hidden', boxShadow: theme.shadows[8] }}>
+                                    <iframe
+                                        width="100%"
+                                        height={isMobile ? 200 : 350}
+                                        src={`https://www.youtube.com/embed/${videoId}`}
+                                        title="YouTube video"
+                                        frameBorder="0"
+                                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    />
+                                </Box>
+                            ) : null;
+                        })()}
 
                         {/* Content */}
                         <Typography 

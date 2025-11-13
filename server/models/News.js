@@ -20,7 +20,27 @@ const newsSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ['technology', 'sports', 'crime', 'politics', 'entertainment', 'other'],
+        enum: [
+            'breaking',           // તાજા સમાચાર
+            'national',          // રાષ્ટ્રીય
+            'international',     // આંતરરાષ્ટ્રીય
+            'state',            // રાજ્ય સમાચાર
+            'city',             // શહેર
+            'politics',         // રાજકારણ
+            'business',         // વ્યવસાય
+            'sports',           // રમતગમત
+            'entertainment',    // મનોરંજન
+            'technology',       // ટેકનોલોજી
+            'health',           // આરોગ્ય
+            'lifestyle',        // જીવનશૈલી
+            'education',        // શિક્ષણ
+            'opinion',          // અભિપ્રાય
+            'blog',             // બ્લોગ
+            'photo',            // તસવીરો
+            'video',            // વીડિયો
+            'weather',          // હવામાન
+            'other'             // અન્ય
+        ],
         default: 'other',
         index: true
     },
@@ -63,11 +83,11 @@ const newsSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
-    likes: [{
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        userName: String,
-        timestamp: { type: Date, default: Date.now }
-    }],
+    likes: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
     comments: [{
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         userName: { type: String, required: true },
@@ -109,6 +129,12 @@ const newsSchema = new mongoose.Schema({
     thumbnailUrl: {
         type: String,
         default: ''
+    },
+    topTenPosition: {
+        type: Number,
+        default: null,
+        min: 1,
+        max: 10
     }
 }, { 
     timestamps: true,
@@ -122,6 +148,7 @@ newsSchema.index({ location: 1, publishedAt: -1 });
 newsSchema.index({ isBreaking: 1, publishedAt: -1 });
 newsSchema.index({ status: 1, publishedAt: -1 });
 newsSchema.index({ views: -1, publishedAt: -1 });
+newsSchema.index({ topTenPosition: 1 }, { sparse: true, unique: false });
 
 // Text search index
 newsSchema.index({ 
@@ -134,7 +161,7 @@ newsSchema.index({
 
 // Virtual for like count
 newsSchema.virtual('likeCount').get(function() {
-    return this.likes ? this.likes.length : 0;
+    return this.likes || 0;
 });
 
 // Virtual for comment count
@@ -148,20 +175,19 @@ newsSchema.methods.incrementViews = function() {
     return this.save();
 };
 
-// Method to add like
-newsSchema.methods.addLike = function(userId, userName) {
-    const existingLike = this.likes.find(like => like.userId.toString() === userId);
-    if (!existingLike) {
-        this.likes.push({ userId, userName });
+// Method to add like (increment count)
+newsSchema.methods.addLike = function() {
+    this.likes += 1;
+    return this.save();
+};
+
+// Method to remove like (decrement count)
+newsSchema.methods.removeLike = function() {
+    if (this.likes > 0) {
+        this.likes -= 1;
         return this.save();
     }
     return this;
-};
-
-// Method to remove like
-newsSchema.methods.removeLike = function(userId) {
-    this.likes = this.likes.filter(like => like.userId.toString() !== userId);
-    return this.save();
 };
 
 // Method to add comment

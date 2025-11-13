@@ -61,7 +61,7 @@ if (!jwtSecret || jwtSecret === 'secret' || jwtSecret === 'defaultSecretKey') {
 
 const mongoUrl = process.env.MONGODB_URL;
 
-mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoUrl)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Could not connect to MongoDB', err));
 
@@ -129,23 +129,21 @@ const externalNewsSchema = new mongoose.Schema({
   duplicate: { type: Boolean }
 }, { strict: false });
 
-// User Schema and Model
-const userSchema = new mongoose.Schema({
-    name: String,
-    email: { type: String, unique: true },
-    password: String,
-    role: String,
-    location: String
-});
-
-const User = mongoose.model('User', userSchema);
+// Import User Model
+const User = require('./models/User');
 
 // Registration Route
 app.post('/register', async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, location } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ name, email, password: hashedPassword });
+        const user = new User({ 
+            name,
+            email, 
+            password: hashedPassword,
+            location: location || '',
+            role: 'user'
+        });
         await user.save();
         console.log(`[INFO] User registered successfully: ${email}`);
         res.status(201).send({ message: 'User registered successfully' });
@@ -166,13 +164,17 @@ app.post('/login', async (req, res) => {
         if (!isPasswordValid) return res.status(401).send({ message: 'Invalid credentials' });
 
         const token = jwt.sign({ id: user._id, role: user.role }, jwtSecret, { expiresIn: '1h' });
-        console.log(`[INFO] User logged in successfully: ${email}, Role: ${user.role}`);
+        
+        // Get display name from 'name' field (the actual field in database)
+        const displayName = user.name || email.split('@')[0];
+        
+        console.log(`[INFO] User logged in successfully: ${email}, Role: ${user.role}, DisplayName: ${displayName}`);
         res.send({ 
             message: 'Login successful', 
             token, 
-            userName: user.userName || user.name, // Handle both userName and name fields
-            userLocation: user.location,
-            userRole: user.role // Include role in the response
+            userName: displayName,
+            userLocation: user.location || '',
+            userRole: user.role
         });
     } catch (err) {
         console.error(`[ERROR] Login failed for email: ${req.body.email}`, err);
@@ -181,7 +183,8 @@ app.post('/login', async (req, res) => {
 });
 
 
-const News = mongoose.model('News', newsSchema);
+// Import News Model
+const News = require('./models/News');
 const ExternalNews = mongoose.model('ExternalNews', externalNewsSchema);
 
 // Routes
@@ -234,12 +237,169 @@ app.post('/news', authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
+// Admin: Get dashboard statistics
+app.get('/admin/stats', authMiddleware, adminMiddleware, async (req, res) => {
+    try {
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        
+        // Total news count
+        const totalNews = await News.countDocuments();
+        
+        // Category-wise counts
+        const categoryStats = await News.aggregate([
+            { $group: { _id: '$category', count: { $sum: 1 } } },
+            { $sort: { count: -1 } }
+        ]);
+        
+        // Top 10 news count
+        const top10Count = await News.countDocuments({ topTenPosition: { $ne: null, $gte: 1, $lte: 10 } });
+        
+        // Recent activity (last 7 days)
+        const recentNews = await News.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
+        
+        // Today's news
+        const todayNews = await News.countDocuments({ createdAt: { $gte: todayStart } });
+        
+        // This month's news
+        const monthlyNews = await News.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
+        
+        // Total likes across all news
+        const likesResult = await News.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalLikes: {
+                        $sum: {
+                            $cond: {
+                                if: { $isArray: '$likes' },
+                                then: { $size: '$likes' },
+                                else: { $ifNull: ['$likes', 0] }
+                            }
+                        }
+                    }
+                }
+            }
+        ]);
+        const totalLikes = likesResult.length > 0 ? likesResult[0].totalLikes : 0;
+        
+        // Today's likes - simplified since likes is a number field
+        const todayLikes = 0; // Cannot track individual like timestamps with current schema
+        
+        // Total views
+        const viewsResult = await News.aggregate([
+            { $group: { _id: null, totalViews: { $sum: { $ifNull: ['$views', 0] } } } }
+        ]);
+        const totalViews = viewsResult.length > 0 ? viewsResult[0].totalViews : 0;
+        
+        // Total comments
+        const commentsResult = await News.aggregate([
+            { 
+                $project: { 
+                    commentCount: { 
+                        $cond: {
+                            if: { $isArray: '$comments' },
+                            then: { $size: '$comments' },
+                            else: 0
+                        }
+                    } 
+                } 
+            },
+            { $group: { _id: null, totalComments: { $sum: '$commentCount' } } }
+        ]);
+        const totalComments = commentsResult.length > 0 ? commentsResult[0].totalComments : 0;
+        
+        // News by date (last 7 days for chart)
+        const newsByDate = await News.aggregate([
+            { $match: { createdAt: { $gte: sevenDaysAgo } } },
+            { 
+                $group: { 
+                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+        
+        // Trending news (most views in last 7 days)
+        const trendingNewsRaw = await News.find({ createdAt: { $gte: sevenDaysAgo } })
+            .sort({ views: -1 })
+            .limit(5)
+            .select('title views likes')
+            .lean();
+
+        // Transform trending news to avoid sending full likes arrays
+        const trendingNews = trendingNewsRaw.map(news => ({
+            title: news.title,
+            views: news.views || 0,
+            likes: news.likes || 0
+        }));
+        
+        // Total users
+        const totalUsers = await User.countDocuments();
+        
+        // Active users (logged in last 7 days)
+        const activeUsers = await User.countDocuments({ lastLogin: { $gte: sevenDaysAgo } });
+        
+        // Users by role
+        const usersByRole = await User.aggregate([
+            { $group: { _id: '$role', count: { $sum: 1 } } }
+        ]);
+        
+        console.log(`[INFO] Admin stats fetched successfully`);
+        res.send({
+            totalNews,
+            todayNews,
+            recentNews,
+            monthlyNews,
+            categoryStats,
+            top10Count,
+            totalLikes,
+            todayLikes,
+            totalViews,
+            totalComments,
+            newsByDate,
+            trendingNews,
+            totalUsers,
+            activeUsers,
+            usersByRole
+        });
+    } catch (err) {
+        console.error(`[ERROR] Failed to fetch admin stats`, err);
+        res.status(500).send({ message: 'Failed to fetch statistics', error: err.message });
+    }
+});
+
 // User: Get all news
 app.get('/news', async (req, res) => {
     try {
         const news = await News.find();
         console.log(`[INFO] Fetched all news`);
-        res.send(news);
+        
+        // Clean the news data to remove MongoDB-specific fields from nested objects
+        const cleanNews = news.map(item => ({
+            _id: item._id,
+            title: item.title,
+            title2: item.title2,
+            content: item.content,
+            author: item.author,
+            approvedby: item.approvedby,
+            tags: item.tags,
+            top: item.top,
+            topTenPosition: item.topTenPosition,
+            video: item.video,
+            image: item.image,
+            source: item.source,
+            views: item.views,
+            likes: item.likes || 0,
+            comments: Array.isArray(item.comments) ? item.comments.length : 0,
+            category: item.category,
+            createdAt: item.createdAt
+        }));
+        
+        res.send(cleanNews);
     } catch (err) {
         console.error(`[ERROR] Failed to fetch news`, err);
         res.status(400).send(err.message);
@@ -253,7 +413,29 @@ app.get('/news/:id', async (req, res) => {
         console.log(`[INFO] Fetching news details for ID: ${req.params.id}`);
         if (!news) return res.status(404).send('News not found');
         console.log(`[INFO] Fetched news details: ${req.params.id}`);
-        res.send(news);
+        
+        // Clean the news data to remove MongoDB-specific fields from nested objects
+        const cleanNews = {
+            _id: news._id,
+            title: news.title,
+            title2: news.title2,
+            content: news.content,
+            author: news.author,
+            approvedby: news.approvedby,
+            tags: news.tags,
+            top: news.top,
+            topTenPosition: news.topTenPosition,
+            video: news.video,
+            image: news.image,
+            source: news.source,
+            views: news.views,
+            likes: news.likes || 0,
+            comments: Array.isArray(news.comments) ? news.comments.length : 0,
+            category: news.category,
+            createdAt: news.createdAt
+        };
+        
+        res.send(cleanNews);
     } catch (err) {
         console.error(`[ERROR] Failed to fetch news details: ${req.params.id}`, err);
         res.status(400).send(err.message);
@@ -267,7 +449,29 @@ app.post('/news/:id/update', authMiddleware, adminMiddleware, async (req, res) =
     try {
         const news = await News.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!news) return res.status(404).send({ message: 'News not found' });
-        res.status(200).send(news);
+        
+        // Clean the news data for response
+        const cleanNews = {
+            _id: news._id,
+            title: news.title,
+            title2: news.title2,
+            content: news.content,
+            author: news.author,
+            approvedby: news.approvedby,
+            tags: news.tags,
+            top: news.top,
+            topTenPosition: news.topTenPosition,
+            video: news.video,
+            image: news.image,
+            source: news.source,
+            views: news.views,
+            likes: news.likes || 0,
+            comments: Array.isArray(news.comments) ? news.comments.length : 0,
+            category: news.category,
+            createdAt: news.createdAt
+        };
+        
+        res.status(200).send(cleanNews);
     } catch (error) {
         console.error('Failed to update news:', error);
         res.status(500).send({ message: 'Internal server error' });
@@ -291,13 +495,30 @@ app.delete('/news/:id', authMiddleware, adminMiddleware, async (req, res) => {
 // User: Like a news (toggle like/unlike)
 app.post('/news/like', async (req, res) => {
     try {
-        const news = await News.findByIdAndUpdate(
+        // First get the current news document
+        const news = await News.findById(req.body.id);
+        if (!news) return res.status(404).send('News not found');
+
+        // Handle migration from array to number if needed
+        let currentLikes = news.likes;
+        if (Array.isArray(currentLikes)) {
+            currentLikes = currentLikes.length;
+        } else if (typeof currentLikes !== 'number') {
+            currentLikes = 0;
+        }
+
+        // Increment likes
+        const newLikes = currentLikes + 1;
+
+        // Update the document
+        const updatedNews = await News.findByIdAndUpdate(
             req.body.id,
-            { $inc: { likes: 1 } },
+            { likes: newLikes },
             { new: true }
         );
-        if (!news) return res.status(404).send('News not found');
-        res.send(news);
+
+        // Return only the likes count
+        res.send({ likes: newLikes });
     } catch (err) {
         res.status(400).send(err.message);
     }
@@ -306,13 +527,30 @@ app.post('/news/like', async (req, res) => {
 // User: Unlike a news (decrement likes)
 app.post('/news/unlike', async (req, res) => {
     try {
-        const news = await News.findByIdAndUpdate(
+        // First get the current news document
+        const news = await News.findById(req.body.id);
+        if (!news) return res.status(404).send('News not found');
+
+        // Handle migration from array to number if needed
+        let currentLikes = news.likes;
+        if (Array.isArray(currentLikes)) {
+            currentLikes = currentLikes.length;
+        } else if (typeof currentLikes !== 'number') {
+            currentLikes = 0;
+        }
+
+        // Decrement likes (don't go below 0)
+        const newLikes = Math.max(0, currentLikes - 1);
+
+        // Update the document
+        const updatedNews = await News.findByIdAndUpdate(
             req.body.id,
-            { $inc: { likes: -1 } },
+            { likes: newLikes },
             { new: true }
         );
-        if (!news) return res.status(404).send('News not found');
-        res.send(news);
+
+        // Return only the likes count
+        res.send({ likes: newLikes });
     } catch (err) {
         res.status(400).send(err.message);
     }
@@ -324,7 +562,11 @@ app.post('/news/comments', async (req, res) => {
         const news = await News.findById(req.body.id);
         if (!news) return res.status(404).send('News not found');
         console.log(`[INFO] Fetched comments for news: ${req.body.id}`);
-        res.send(news.comments);
+        const cleanComments = news.comments.map(comment => ({
+            user: comment.user,
+            comment: comment.comment
+        }));
+        res.send(cleanComments);
     } catch (err) {
         console.error(`[ERROR] Failed to fetch comments for news: ${req.body.id}`, err);
         res.status(400).send(err.message);
@@ -341,7 +583,11 @@ app.post('/news/comments/add', async (req, res) => {
         );
         if (!news) return res.status(404).send('News not found');
         console.log(`[INFO] Comment added successfully for news: ${req.body.id}`);
-        res.send(news.comments[news.comments.length - 1]);
+        const newComment = news.comments[news.comments.length - 1];
+        res.send({
+            user: newComment.user,
+            comment: newComment.comment
+        });
     } catch (err) {
         console.error(`[ERROR] Failed to add comment for news: ${req.body.id}`, err);
         res.status(400).send(err.message);
@@ -494,6 +740,11 @@ app.post('/external-news/fetch-and-store', async (req, res) => {
 // Import and use external API routes
 const externalApiRoutes = require('./routes/externalApiRoutes');
 app.use('/api/external', externalApiRoutes);
+
+// === USER ROUTES ===
+// Import and use user management routes
+const userRoutes = require('./routes/userRoutes');
+app.use('/user', userRoutes);
 
 // Initialize cron jobs for data fetching
 const cronManager = require('./middleware/cronManager');

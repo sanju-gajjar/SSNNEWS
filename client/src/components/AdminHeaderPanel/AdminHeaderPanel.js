@@ -27,9 +27,17 @@ function AdminHeaderPanel(props) {
     };
     const theme = useTheme();
     const handleLogout = () => {
+      // Clear all auth-related data
       localStorage.removeItem('isLoggedIn');
       localStorage.removeItem('userName');
       localStorage.removeItem('userLocation');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('token');
+      
+      // Clear any session storage as well
+      sessionStorage.clear();
+      
+      // Force redirect and reload
       window.location.href = '/';
     };
   return (

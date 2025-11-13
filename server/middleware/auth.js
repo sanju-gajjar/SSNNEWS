@@ -24,4 +24,12 @@ const adminMiddleware = (req, res, next) => {
     next();
 };
 
-module.exports = { authMiddleware, adminMiddleware };
+// Middleware to check if user is admin or reporter
+const adminOrReporterMiddleware = (req, res, next) => {
+    if (req.user.role !== 'admin' && req.user.role !== 'reporter') {
+        return res.status(403).json({ message: 'Access denied. Admin or Reporter role required.' });
+    }
+    next();
+};
+
+module.exports = { authMiddleware, adminMiddleware, adminOrReporterMiddleware };

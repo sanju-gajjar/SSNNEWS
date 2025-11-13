@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, Grid, Dialog, DialogTitle, DialogContent
 import ColorSlider from '../UI/ColorSlider';
 import AdminTopCss from './AdminTopPanel.css';
 import axiosInstance from '../../api/axiosInstance';
+import CategoryDropdown from '../CategoryDropdown';
 
 // Using axiosInstance instead of API_URL
 
@@ -14,10 +15,12 @@ function AdminTopPanel() {
     title: '',
     title2: '',
     content: '',
+    category: 'other',
     author: '',
     approvedby: '',
     tags: '',
     top: 0,
+    topTenPosition: null,
     video: '',
     image: '',
     source: '',
@@ -37,7 +40,7 @@ function AdminTopPanel() {
 
   const handleSubmit = async () => {
     const {
-      title, title2, content, author, approvedby, tags, top, video, image, source,
+      title, title2, content, category, author, approvedby, tags, top, topTenPosition, video, image, source,
       views, likes, comments, createdAt
     } = formData;
     if (!title || !content || !author || !approvedby || !tags || !video || !image || !source) {
@@ -50,10 +53,12 @@ function AdminTopPanel() {
         title,
         title2,
         content,
+        category: category || 'other',
         author,
         approvedby,
         tags: Array.isArray(tags) ? tags : tags.split(',').map(tag => tag.trim()).filter(Boolean),
         top: typeof top === 'string' ? Number(top) : top,
+        topTenPosition: topTenPosition && topTenPosition >= 1 && topTenPosition <= 10 ? Number(topTenPosition) : null,
         video,
         image,
         source,
@@ -65,6 +70,25 @@ function AdminTopPanel() {
       const response = await axiosInstance.post(`/news`, payload);
       alert('News added successfully!');
       handleClose();
+      // Reset form
+      setFormData({
+        title: '',
+        title2: '',
+        content: '',
+        category: 'other',
+        author: '',
+        approvedby: '',
+        tags: '',
+        top: 0,
+        topTenPosition: null,
+        video: '',
+        image: '',
+        source: '',
+        views: 0,
+        likes: 0,
+        comments: [],
+        createdAt: new Date().toISOString()
+      });
     } catch (error) {
       console.error('Error adding news:', error);
       alert('Failed to add news.');
@@ -117,31 +141,103 @@ function AdminTopPanel() {
         <DialogTitle>Upload Top News</DialogTitle>
         <DialogContent>
           <form id="newsForm">
-            <TextField name="title" label="Title" fullWidth margin="dense" defaultValue={formData.title} />
-            <TextField name="title2" label="Title 2" fullWidth margin="dense" defaultValue={formData.title2} />
-            <TextField name="content" label="Content" fullWidth margin="dense" multiline rows={4} defaultValue={formData.content} />
-            <TextField name="author" label="Author" fullWidth margin="dense" defaultValue={formData.author} />
-            <TextField name="approvedby" label="Approved By" fullWidth margin="dense" defaultValue={formData.approvedby} />
-            <TextField name="tags" label="Tags (comma-separated)" fullWidth margin="dense" defaultValue={formData.tags} />
-            <TextField name="top" label="Top (1 or 0)" type="number" fullWidth margin="dense" defaultValue={formData.top} />
-            <TextField name="video" label="Video URL" fullWidth margin="dense" defaultValue={formData.video} />
-            <TextField name="image" label="Image URL" fullWidth margin="dense" defaultValue={formData.image} />
-            <TextField name="source" label="Source URL" fullWidth margin="dense" defaultValue={formData.source} />
+            <TextField 
+              name="title" 
+              label="Title" 
+              fullWidth 
+              margin="dense" 
+              value={formData.title}
+              onChange={handleChange}
+            />
+            <TextField 
+              name="title2" 
+              label="Title 2" 
+              fullWidth 
+              margin="dense" 
+              value={formData.title2}
+              onChange={handleChange}
+            />
+            <TextField 
+              name="content" 
+              label="Content" 
+              fullWidth 
+              margin="dense" 
+              multiline 
+              rows={4} 
+              value={formData.content}
+              onChange={handleChange}
+            />
+            <CategoryDropdown 
+              value={formData.category} 
+              onChange={handleChange}
+              name="category"
+              label="Category / શ્રેણી"
+              required
+            />
+            <TextField 
+              name="author" 
+              label="Author" 
+              fullWidth 
+              margin="dense" 
+              value={formData.author}
+              onChange={handleChange}
+            />
+            <TextField 
+              name="approvedby" 
+              label="Approved By" 
+              fullWidth 
+              margin="dense" 
+              value={formData.approvedby}
+              onChange={handleChange}
+            />
+            <TextField 
+              name="tags" 
+              label="Tags (comma-separated)" 
+              fullWidth 
+              margin="dense" 
+              value={formData.tags}
+              onChange={handleChange}
+            />
+            <TextField 
+              name="topTenPosition" 
+              label="Top 10 Position (1-10, leave blank for none)" 
+              type="number" 
+              fullWidth 
+              margin="dense" 
+              value={formData.topTenPosition || ''}
+              onChange={handleChange}
+              inputProps={{ min: 1, max: 10 }}
+            />
+            <TextField 
+              name="video" 
+              label="Video URL" 
+              fullWidth 
+              margin="dense" 
+              value={formData.video}
+              onChange={handleChange}
+            />
+            <TextField 
+              name="image" 
+              label="Image URL" 
+              fullWidth 
+              margin="dense" 
+              value={formData.image}
+              onChange={handleChange}
+            />
+            <TextField 
+              name="source" 
+              label="Source URL" 
+              fullWidth 
+              margin="dense" 
+              value={formData.source}
+              onChange={handleChange}
+            />
           </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">Cancel</Button>
           <Button
-            onClick={() => {
-              const form = document.getElementById('newsForm');
-              const data = {};
-              Array.from(form.elements).forEach(el => {
-                if (el.name) data[el.name] = el.value;
-              });
-              setFormData(data);
-              // Call handleSubmit with updated formData
-              setTimeout(handleSubmit, 0);
-            }}
+            onClick={handleSubmit}
             color="primary"
           >
             Submit

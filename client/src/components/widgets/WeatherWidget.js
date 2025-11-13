@@ -104,6 +104,20 @@ const WeatherWidget = ({ language = 'gujarati', compact = false, selectedCity = 
         return `${days} ${tCommon.daysAgo[language]}`;
     };
 
+    const getTranslatedWeatherDescription = (description) => {
+        if (!description) return description;
+        
+        const conditionKey = description.toLowerCase();
+        const conditions = t.conditions;
+        
+        if (conditions && conditions[conditionKey] && conditions[conditionKey][language]) {
+            return conditions[conditionKey][language];
+        }
+        
+        // Fallback to original description if translation not found
+        return description;
+    };
+
     if (loading) {
         return (
             <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden' }}>
@@ -190,7 +204,7 @@ const WeatherWidget = ({ language = 'gujarati', compact = false, selectedCity = 
                             </Grid>
                             <Grid item xs={6}>
                                 <Typography variant="body2">
-                                    {summary.generalCondition}
+                                    {getTranslatedWeatherDescription(summary.generalCondition)}
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -237,7 +251,7 @@ const WeatherWidget = ({ language = 'gujarati', compact = false, selectedCity = 
                                                 {city.temperature}°
                                             </Typography>
                                             <Typography variant="caption" color="text.secondary">
-                                                {city.description}
+                                                {getTranslatedWeatherDescription(city.description)}
                                             </Typography>
                                         </Box>
 

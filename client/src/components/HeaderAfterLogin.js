@@ -105,12 +105,21 @@ const HeaderAfterLogin = ({ userName, userLocation: initialDistrict, burgerMenu 
                     <Divider />
                     <MenuItem
                         onClick={() => {
+                            // Clear all auth-related data
                             localStorage.removeItem('isLoggedIn');
                             localStorage.removeItem('userName');
                             localStorage.removeItem('userLocation');
+                            localStorage.removeItem('userRole');
+                            localStorage.removeItem('token');
+                            
+                            // Clear session storage
+                            sessionStorage.clear();
+                            
+                            // Call onLogout callback if provided
                             if (typeof window.onLogout === 'function') window.onLogout();
-                            navigate('/');
-                            setTimeout(() => window.location.reload(), 0);
+                            
+                            // Force redirect to home and reload
+                            window.location.href = '/';
                         }}
                     >
                         Logout

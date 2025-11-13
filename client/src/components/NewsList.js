@@ -17,21 +17,28 @@ import { Box, Grid, Card, CardContent, CardMedia, Typography, Container } from '
 
 // Using axiosInstance instead of API_URL
 
-const NewsList = () => {
+const NewsList = ({ category = null }) => {
     const [newsList, setNewsList] = useState([]);
     const [externalNews, setExternalNews] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         axiosInstance.get(`/news`)
-            .then(response => setNewsList(response.data))
+            .then(response => {
+                let filteredNews = response.data;
+                // Filter by category if provided
+                if (category) {
+                    filteredNews = response.data.filter(news => news.category === category);
+                }
+                setNewsList(filteredNews);
+            })
             .catch(error => console.error(error));
 
         // Fetch external news
         axiosInstance.post(`/external-news/fetch-and-store`)
             .then(response => setExternalNews(response.data.news || []))
             .catch(error => console.error(error));
-    }, []);
+    }, [category]);
 
     const handleReadMore = (id) => {
         navigate(`/news/${id}`);

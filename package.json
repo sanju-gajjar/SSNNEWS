@@ -34,5 +34,8 @@
     "local-news"
   ],
   "author": "SSN News Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "mongoose": "^8.19.3"
+  }
 }

@@ -111,6 +111,163 @@ const translations = {
       gujarati: "આગાહી",
       hindi: "पूर्वानुमान",
       english: "Forecast"
+    },
+    conditions: {
+      "clear sky": {
+        gujarati: "સ્પષ્ટ આકાશ",
+        hindi: "साफ आसमान",
+        english: "Clear Sky"
+      },
+      "few clouds": {
+        gujarati: "થોડા વાદળો",
+        hindi: "कुछ बादल",
+        english: "Few Clouds"
+      },
+      "scattered clouds": {
+        gujarati: "અલગ-અલગ વાદળો",
+        hindi: "बिखरे बादल",
+        english: "Scattered Clouds"
+      },
+      "broken clouds": {
+        gujarati: "તૂટેલા વાદળો",
+        hindi: "टूटे बादल",
+        english: "Broken Clouds"
+      },
+      "shower rain": {
+        gujarati: "ઝાકળ વરસાદ",
+        hindi: "हल्की बारिश",
+        english: "Shower Rain"
+      },
+      "rain": {
+        gujarati: "વરસાદ",
+        hindi: "बारिश",
+        english: "Rain"
+      },
+      "thunderstorm": {
+        gujarati: "આકાશવાણી",
+        hindi: "आंधी तूफान",
+        english: "Thunderstorm"
+      },
+      "snow": {
+        gujarati: "બરફ",
+        hindi: "बर्फ",
+        english: "Snow"
+      },
+      "mist": {
+        gujarati: "ધુમ્મસ",
+        hindi: "कोहरा",
+        english: "Mist"
+      },
+      "haze": {
+        gujarati: "ધુમ્મસ",
+        hindi: "धुंध",
+        english: "Haze"
+      },
+      "fog": {
+        gujarati: "ધુમ્મસ",
+        hindi: "कोहरा",
+        english: "Fog"
+      },
+      "smoke": {
+        gujarati: "ધુમાડો",
+        hindi: "धुआं",
+        english: "Smoke"
+      },
+      "dust": {
+        gujarati: "ધૂળ",
+        hindi: "धूल",
+        english: "Dust"
+      },
+      "sand": {
+        gujarati: "રેત",
+        hindi: "रेत",
+        english: "Sand"
+      },
+      "ash": {
+        gujarati: "રાખ",
+        hindi: "राख",
+        english: "Ash"
+      },
+      "squall": {
+        gujarati: "તોફાની પવન",
+        hindi: "तूफानी हवा",
+        english: "Squall"
+      },
+      "tornado": {
+        gujarati: "ચક્રવાત",
+        hindi: "बवंडर",
+        english: "Tornado"
+      },
+      "overcast clouds": {
+        gujarati: "આછા વાદળો",
+        hindi: "बादलों से भरे आसमान",
+        english: "Overcast Clouds"
+      },
+      "light rain": {
+        gujarati: "હળવો વરસાદ",
+        hindi: "हल्की बारिश",
+        english: "Light Rain"
+      },
+      "moderate rain": {
+        gujarati: "મધ્યમ વરસાદ",
+        hindi: "मध्यम बारिश",
+        english: "Moderate Rain"
+      },
+      "heavy intensity rain": {
+        gujarati: "જોરદાર વરસાદ",
+        hindi: "तेज बारिश",
+        english: "Heavy Rain"
+      },
+      "very heavy rain": {
+        gujarati: "ખૂબ જોરદાર વરસાદ",
+        hindi: "बहुत तेज बारिश",
+        english: "Very Heavy Rain"
+      },
+      "extreme rain": {
+        gujarati: "અત્યંત જોરદાર વરસાદ",
+        hindi: "अत्यंत तेज बारिश",
+        english: "Extreme Rain"
+      },
+      "freezing rain": {
+        gujarati: "જમાવ વરસાદ",
+        hindi: "जमने वाली बारिश",
+        english: "Freezing Rain"
+      },
+      "light snow": {
+        gujarati: "હળવો બરફ",
+        hindi: "हल्की बर्फ",
+        english: "Light Snow"
+      },
+      "heavy snow": {
+        gujarati: "જોરદાર બરફ",
+        hindi: "तेज बर्फ",
+        english: "Heavy Snow"
+      },
+      "sleet": {
+        gujarati: "બરફવરસાદ",
+        hindi: "ओला",
+        english: "Sleet"
+      },
+      "shower sleet": {
+        gujarati: "ઝાકળ ઓલા",
+        hindi: "हल्का ओला",
+        english: "Shower Sleet"
+      },
+      "light shower snow": {
+        gujarati: "હળવો ઝાકળ બરફ",
+        hindi: "हल्की बर्फ की बौछार",
+        english: "Light Shower Snow"
+      },
+      "shower snow": {
+        gujarati: "ઝાકળ બરફ",
+        hindi: "बर्फ की बौछार",
+        english: "Shower Snow"
+      },
+      "heavy shower snow": {
+        gujarati: "જોરદાર ઝાકળ બરફ",
+        hindi: "तेज बर्फ की बौछार",
+        english: "Heavy Shower Snow"
+      }
     }
   },
   horoscope: {

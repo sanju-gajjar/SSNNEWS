@@ -225,39 +225,36 @@ function AdminFilterPanel({ category, onCategoryChange }) {
                     <Typography variant="body2" sx={{ color: '#444', mb: 1, minHeight: 48, whiteSpace: 'pre-line', wordBreak: 'break-word' }}>
                       {news.content}
                     </Typography>
-                    {news.video && (
-                      <Box sx={{ textAlign: 'center', mb: 2 }}>
-                        <iframe
-                          width="100%"
-                          height={isMobile ? 200 : 350}
-                          src={`https://www.youtube.com/embed/${(() => {
-                            const url = news.video;
-                            // Handle youtu.be short links and normal links
-                            let videoId = '';
-                            // youtu.be/<id>
-                            const shortMatch = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
-                            if (shortMatch && shortMatch[1]) videoId = shortMatch[1];
-                            else {
-                              // Normal YouTube links
-                              const match = url.match(/(?:v=|\/embed\/|\/live\/|\/shorts\/|\/watch\?v=)([A-Za-z0-9_-]{11})/);
-                              if (match && match[1]) videoId = match[1];
-                              else {
-                                // Try to get last part if it looks like an ID
-                                const parts = url.split('/');
-                                const last = parts[parts.length - 1].split('?')[0];
-                                videoId = last.length === 11 ? last : url;
-                              }
-                            }
-                            return videoId;
-                          })()}?autoplay=1`}
-                          title="YouTube video"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          style={{ borderRadius: 16, boxShadow: 2 }}
-                        />
-                      </Box>
-                    )}
+                    {news.video && (() => {
+                      const url = news.video;
+                      let videoId = '';
+                      const shortMatch = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
+                      if (shortMatch && shortMatch[1]) videoId = shortMatch[1];
+                      else {
+                        const match = url.match(/(?:v=|\/embed\/|\/live\/|\/shorts\/|\/watch\?v=)([A-Za-z0-9_-]{11})/);
+                        if (match && match[1]) videoId = match[1];
+                        else {
+                          const parts = url.split('/');
+                          const last = parts[parts.length - 1].split('?')[0];
+                          videoId = last.length === 11 ? last : '';
+                        }
+                      }
+                      // Only show if valid video ID
+                      return videoId ? (
+                        <Box sx={{ textAlign: 'center', mb: 2 }}>
+                          <iframe
+                            width="100%"
+                            height={isMobile ? 200 : 350}
+                            src={`https://www.youtube.com/embed/${videoId}`}
+                            title="YouTube video"
+                            frameBorder="0"
+                            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            style={{ borderRadius: 16, boxShadow: 2 }}
+                          />
+                        </Box>
+                      ) : null;
+                    })()}
                   </CardContent>
                   <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
                     <Tooltip title="Edit this news" arrow>
