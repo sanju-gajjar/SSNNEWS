@@ -12,23 +12,25 @@ const { authMiddleware, adminMiddleware } = require('./middleware/auth');
 // More flexible CORS configuration for production
 const corsOptions = {
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or Postman)
         if (!origin) return callback(null, true);
-        
-        const allowedOrigins = [
-            'http://localhost:3000',
-            'http://localhost:3001', 
-            'https://ssanews.onrender.com',
-            'http://localhost:8080',
-            'https://ssnnews.onrender.com',
-            'http://swadeshsandeshnews.com',
-            'https://swadeshsandeshnews.com',
-        ];
-        
-        // Allow any render.com subdomain
-        if (origin.includes('onrender.com') || allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
+
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:8080',
+  'https://ssanews.onrender.com',
+  'https://ssnnews.onrender.com',
+  'http://swadeshsandeshnews.com',
+  'https://swadeshsandeshnews.com',
+];
+
+const isAllowed =
+  allowedOrigins.includes(origin) ||
+  origin.endsWith('.onrender.com');
+
+if (isAllowed) return callback(null, true);
+
+return callback(new Error('Not allowed by CORS'));
         
         console.log('CORS blocked origin:', origin);
         callback(new Error('Not allowed by CORS'));
