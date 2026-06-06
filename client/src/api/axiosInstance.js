@@ -3,7 +3,7 @@ import axios from 'axios';
 // Determine API URL based on environment
 const getApiUrl = () => {
     // If we're on render.com, use the same domain for API
-    if (window.location.hostname.includes('onrender.com')) {
+    if (window.location.hostname.includes('swadeshsandeshnews.com')) {
         return window.location.origin;
     }
     
