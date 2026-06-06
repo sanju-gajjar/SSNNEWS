@@ -667,6 +667,12 @@ app.post('/external-news/fetch-and-store', async (req, res) => {
         const startOfDay = new Date(today.setHours(0, 0, 0, 0));
         const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
+        // Ensure API key is available
+        if (!apiKey) {
+            console.error('[ERROR] NEWS_API_KEY is not set in environment');
+            return res.status(500).send({ message: 'NEWS_API_KEY is not configured on the server' });
+        }
+
         // Check if today's external news already exists
         let existingNews = await ExternalNews.find({
             createdAt: { $gte: startOfDay, $lte: endOfDay }
@@ -684,23 +690,40 @@ app.post('/external-news/fetch-and-store', async (req, res) => {
             `https://newsdata.io/api/1/latest?country=in&language=hi&apikey=${apiKey}`
         ];
 
-        // Fetch each URL sequentially with a delay between requests
+        // Fetch each URL sequentially with a delay between requests and per-URL error handling
         const responses = [];
         for (const url of urls) {
-            const response = await axios.get(url);
-            responses.push(response);
+            try {
+                const response = await axios.get(url);
+                responses.push(response);
+            } catch (e) {
+                console.error(`[ERROR] Failed to fetch external URL ${url}:`, e.response ? e.response.data : e.message);
+                // skip this URL and continue with others
+                continue;
+            }
             // Wait for 500ms between requests to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
         let allNews = [];
         responses.forEach(resp => {
-            if (resp.data && Array.isArray(resp.data.results)) {
+            if (!resp || !resp.data) return;
+            // support common shapes: { results: [] } or { articles: [] } or direct array
+            if (Array.isArray(resp.data)) {
+                allNews = allNews.concat(resp.data);
+            } else if (Array.isArray(resp.data.results)) {
                 allNews = allNews.concat(resp.data.results);
+            } else if (Array.isArray(resp.data.articles)) {
+                allNews = allNews.concat(resp.data.articles);
             }
         });
 
         // Store in MongoDB with createdAt as today and source as 'external'
         const now = new Date();
+        if (!allNews || allNews.length === 0) {
+            console.log('[INFO] No external news items found from configured sources');
+            return res.send({ count: 0, message: 'No external news found', news: [] });
+        }
+
         const newsDocs = allNews.map(n => ({
             article_id: n.article_id || '',
             title: n.title || '',
