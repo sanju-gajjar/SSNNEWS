@@ -1,16 +1,7 @@
----
 deployment:
-  tasks:
-    - export REPOPATH=/home/qrqiaoxq/repositories/SSNNEWS
-
-    - cd $REPOPATH
-    - npm install
-
-    - cd server
-    - npm install
-
-    - cd ../client
-    - npm install
-    - npm run build
-
-    - echo "Deployment completed successfully"
+tasks:
+- cd /home/qrqiaoxq/repositories/SSNNEWS
+- npm install
+- cd server && npm install
+- cd ../client && npm install
+- npm run build
