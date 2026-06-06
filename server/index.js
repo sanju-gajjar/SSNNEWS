@@ -20,7 +20,9 @@ const corsOptions = {
             'http://localhost:3001', 
             'https://ssanews.onrender.com',
             'http://localhost:8080',
-            'https://ssnnews.onrender.com'
+            'https://ssnnews.onrender.com',
+            'http://swadeshsandeshnews.com',
+            'https://swadeshsandeshnews.com',
         ];
         
         // Allow any render.com subdomain
