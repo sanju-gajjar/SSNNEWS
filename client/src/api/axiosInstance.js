@@ -7,15 +7,7 @@ const getApiUrl = () => {
         return window.location.origin;
     }
     
-    // Use environment variable or fallback to localhost
-    const envUrl = process.env.REACT_APP_API_URL;
-    if (envUrl) {
-        // If the env var doesn't include a protocol, assume http and prepend it
-        if (!envUrl.startsWith('http://') && !envUrl.startsWith('https://') && !envUrl.startsWith('//')) {
-            return `http://${envUrl}`;
-        }
-        return envUrl;
-    }
+   
 
     return 'https://swadeshsandeshnews.com';
 };
