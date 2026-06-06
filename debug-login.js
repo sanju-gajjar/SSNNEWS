@@ -1,7 +1,7 @@
 // Debug script to test admin login
 const axios = require('axios');
 
-const API_URL = 'http://swadeshsandeshnews.com';
+const API_URL = 'https://swadeshsandeshnews.com';
 
 async function testAdminLogin() {
     try {

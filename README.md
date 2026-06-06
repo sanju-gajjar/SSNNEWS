@@ -80,7 +80,7 @@ Feel free to submit issues or pull requests for any improvements or features you
 
 To run project simply export two var as below 
  export MONGODB_URL=<<MONGOURL>>
- export REACT_APP_API_URL='http://swadeshsandeshnews.com' 
+ export REACT_APP_API_URL='https://swadeshsandeshnews.com' 
 
  and open two terminal one in server and one client, 
  run command in server : node index.js

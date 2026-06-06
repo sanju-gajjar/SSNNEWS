@@ -7,7 +7,7 @@ services:
     staticPublishPath: build # Adjusted to match the build output folder
     envVars:
       - key: REACT_APP_API_URL
-        value: http://swadeshsandeshnews.com/
+        value: https://swadeshsandeshnews.com/
     plan: free
     routes:
       - type: rewrite

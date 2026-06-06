@@ -17,7 +17,7 @@ const getApiUrl = () => {
         return envUrl;
     }
 
-    return 'http://swadeshsandeshnews.com';
+    return 'https://swadeshsandeshnews.com';
 };
 
 const axiosInstance = axios.create({

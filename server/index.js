@@ -20,7 +20,7 @@ const allowedOrigins = [
   'http://localhost:8080',
   'https://ssanews.onrender.com',
   'https://ssnnews.onrender.com',
-  'http://swadeshsandeshnews.com',
+  'https://swadeshsandeshnews.com',
   'https://swadeshsandeshnews.com',
 ];
 
