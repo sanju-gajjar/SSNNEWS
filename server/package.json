@@ -9,7 +9,8 @@
     "dev": "nodemon index.js",
     "build-client": "cd ../client && npm install && npm run build && rm -rf ../server/client/build && cp -r build ../server/client/build",
     "start:prod": "NODE_ENV=production node index.js",
-    "start:pm2": "pm2 start index.js --name ssnnews"
+    "start:pm2": "pm2 start index.js --name ssnnews",
+    "deploy": "npm run build-client && npm run start:prod"
   },
   "repository": {
     "type": "git",
