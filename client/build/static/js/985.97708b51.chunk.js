@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkclient=self.webpackChunkclient||[]).push([[985],{985:(e,t,s)=>{s.r(t),s.d(t,{default:()=>n});s(5043);var l=s(579);const n=function(){return(0,l.jsx)("div",{className:"bottomPanel",children:(0,l.jsx)("p",{children:"\xa9 2025 SSN News. All rights reserved. Author: Gajjar Legal Rights: All content is protected under copyright law. Complaints: Contact us at +1-800-555-SSN"})})}}}]);
-//# sourceMappingURL=985.97708b51.chunk.js.map
