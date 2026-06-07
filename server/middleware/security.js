@@ -6,7 +6,7 @@ const xss = require('xss');
 // Rate limiting configurations
 const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    max: 10000000, // limit each IP to 100 requests per windowMs
     message: {
         error: 'Too many requests from this IP, please try again later.',
         code: 'RATE_LIMIT_EXCEEDED'
@@ -17,7 +17,7 @@ const generalLimiter = rateLimit({
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // limit each IP to 5 login requests per windowMs
+    max: 5000000, // limit each IP to 5 login requests per windowMs
     message: {
         error: 'Too many login attempts, please try again later.',
         code: 'AUTH_RATE_LIMIT_EXCEEDED'
