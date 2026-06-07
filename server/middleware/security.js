@@ -42,10 +42,10 @@ const securityMiddleware = (app) => {
         },
     }));
     
-    // Apply rate limiting
-    app.use('/api', generalLimiter);
-    app.use('/login', generalLimiter);
-    app.use('/register', generalLimiter);
+    // // Apply rate limiting
+    // app.use('/api', generalLimiter);
+    // app.use('/login', generalLimiter);
+    // app.use('/register', generalLimiter);
     
     // Input sanitization middleware
     app.use('/api', (req, res, next) => {
