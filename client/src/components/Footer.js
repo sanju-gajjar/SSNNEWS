@@ -47,7 +47,62 @@ const Footer = () => {
                     </ul>
                 </Grid>
             </Grid>
+                <footer class="footer">
+
+    <!-- Contact Information -->
+    <section class="footer-contact">
+        <h2>સ્વદેશ સંદેશ</h2>
+        <p><strong>મોબાઇલ:</strong> 94263 51154</p>
+    </section>
+
+    <!-- Help & Support Information -->
+    <section class="footer-services">
+        <h3>અમારો સંપર્ક કરો</h3>
+
+        <ol>
+            <li>સ્ત્રીઓ, બાળકો કે કોઈ વ્યક્તિ પર અત્યાચાર, શોષણ અથવા અન્યાય થતો હોય.</li>
+
+            <li>ભણતર, દવા, બ્લડ અથવા વૃદ્ધાશ્રમ માટે મદદની જરૂર હોય.</li>
+
+            <li>વિધવા, અપંગ અથવા નિરાધાર વ્યક્તિને સમાજ સુરક્ષા ખાતામાં મદદની જરૂર હોય.</li>
+
+            <li>RTI Act 2005 અંગે માર્ગદર્શન માટે સંપર્ક કરો.</li>
+        </ol>
+
+        <p>
+            જો જીવનમાં મુશ્કેલી અનુભવતા હોવ, જીવન જીવવાનો માર્ગ ન મળતો હોય
+            અથવા નકારાત્મક વિચારો આવતા હોય તો અમારો સંપર્ક અવશ્ય કરો.
+        </p>
+    </section>
+
+    <!-- Publication Details -->
+    <section class="footer-publication">
+        <p>
+            <strong>Owner, Printer, Publisher &amp; Editor:</strong>
+            Gajjar Yogeshbhai Jagjivanbhai
+        </p>
+
+        <address>
+            <strong>Printed At:</strong>
+            Shivam Offset, Plot No. 101/1/8, GIDC, Sector-28, Gandhinagar
+        </address>
+
+        <address>
+            <strong>Published By:</strong>
+            "Swadesh Sandesh" Office,
+            D-40, Janmbhumi Society, Kadi,
+            Ta. Kadi, Dist. Mahesana - 382715
+        </address>
+    </section>
+
+    <!-- Copyright -->
+    <section class="footer-copyright">
+        <p>&copy; Swadesh Sandesh News. All Rights Reserved.</p>
+    </section>
+
+</footer>
         </Box>
+
     );
 };
 
